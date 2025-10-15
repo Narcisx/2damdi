@@ -3,14 +3,14 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2025-10-15T14:06:31+02:00</updated>
+    <updated>2025-10-15T14:24:59+02:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
     <id>https://narcisx.github.io/2damdi</id>
 
     <entry>
-        <title>Pryecto 1</title>
+        <title>Pomodoro</title>
         <author>
             <name>Germán Narciso Córdoba</name>
         </author>
@@ -22,7 +22,7 @@
             <summary>
                 <![CDATA[
                         <img src="https://narcisx.github.io/2damdi/media/posts/3/Captura-de-pantalla-2025-10-15-140611.png" alt="" />
-                    Pomodoro blablablabablbla
+                    Pomodoro - Documentación Aquí encontraremos el paso a paso de cada prompt&hellip;
                 ]]>
             </summary>
         <content type="html">
@@ -30,11 +30,11 @@
                     <p><img src="https://narcisx.github.io/2damdi/media/posts/3/Captura-de-pantalla-2025-10-15-140611.png" class="type:primaryImage" alt="" /></p>
                 <section class="project">
 <div class="project-content">
-<h2>Pomodoro</h2>
-<p class="project-description">blablablabablbla</p>
-<div class="project-image-container"><figure class="project-image"><img loading="lazy"  src="https://via.placeholder.com/800x500" alt="Imagen del Proyecto 3" data-is-external-image="true"></figure></div>
-</div>
-</section>
+<h2>Pomodoro - Documentación</h2>
+<p class="project-description">Aquí encontraremos el paso a paso de cada prompt indicado.</p>
+<div class="project-image-container"> </div>
+Esto es una prueba</div>
+<a href="Pomodoro/index.html">adasdasd</a></section>
             ]]>
         </content>
     </entry>
