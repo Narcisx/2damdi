@@ -3,7 +3,7 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2025-10-15T13:49:06+02:00</updated>
+    <updated>2025-10-15T14:06:31+02:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
@@ -16,18 +16,20 @@
         </author>
         <link href="https://narcisx.github.io/2damdi/pryecto-1.html"/>
         <id>https://narcisx.github.io/2damdi/pryecto-1.html</id>
+        <media:content url="https://narcisx.github.io/2damdi/media/posts/3/Captura-de-pantalla-2025-10-15-140611.png" medium="image" />
 
         <updated>2025-10-14T20:44:08+02:00</updated>
             <summary>
                 <![CDATA[
-                    Ciencia de Datos / Python blablablabablbla
+                        <img src="https://narcisx.github.io/2damdi/media/posts/3/Captura-de-pantalla-2025-10-15-140611.png" alt="" />
+                    Pomodoro blablablabablbla
                 ]]>
             </summary>
         <content type="html">
             <![CDATA[
+                    <p><img src="https://narcisx.github.io/2damdi/media/posts/3/Captura-de-pantalla-2025-10-15-140611.png" class="type:primaryImage" alt="" /></p>
                 <section class="project">
 <div class="project-content">
-<p>Ciencia de Datos / Python</p>
 <h2>Pomodoro</h2>
 <p class="project-description">blablablabablbla</p>
 <div class="project-image-container"><figure class="project-image"><img loading="lazy"  src="https://via.placeholder.com/800x500" alt="Imagen del Proyecto 3" data-is-external-image="true"></figure></div>
