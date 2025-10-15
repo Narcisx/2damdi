@@ -9,5 +9,33 @@
         "name": "Germán Narciso Córdoba"
     },
     "items": [
+        {
+            "id": "https://narcisx.github.io/2damdi/pryecto-1.html",
+            "url": "https://narcisx.github.io/2damdi/pryecto-1.html",
+            "title": "Pryecto 1",
+            "summary": "Ciencia de Datos / Python blablablabablbla",
+            "content_html": "<section class=\"project\">\n<div class=\"project-content\">\n<p>Ciencia de Datos / Python</p>\n<h2>Pomodoro</h2>\n<p class=\"project-description\">blablablabablbla</p>\n<div class=\"project-image-container\"><figure class=\"project-image\"><img loading=\"lazy\"  src=\"https://via.placeholder.com/800x500\" alt=\"Imagen del Proyecto 3\" data-is-external-image=\"true\"></figure></div>\n</div>\n</section>",
+            "author": {
+                "name": "Germán Narciso Córdoba"
+            },
+            "tags": [
+            ],
+            "date_published": "2025-10-14T20:44:08+02:00",
+            "date_modified": "2025-10-15T13:49:06+02:00"
+        },
+        {
+            "id": "https://narcisx.github.io/2damdi/purebaaaasdda.html",
+            "url": "https://narcisx.github.io/2damdi/purebaaaasdda.html",
+            "title": "PUREBAAAASDda",
+            "summary": "PUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDda",
+            "content_html": "<p>PUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDda</p>",
+            "author": {
+                "name": "Germán Narciso Córdoba"
+            },
+            "tags": [
+            ],
+            "date_published": "2025-10-14T20:42:57+02:00",
+            "date_modified": "2025-10-14T20:42:57+02:00"
+        }
     ]
 }

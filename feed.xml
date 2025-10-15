@@ -3,10 +3,57 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>1970-01-01T01:00:00+01:00</updated>
+    <updated>2025-10-15T13:49:06+02:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
     <id>https://narcisx.github.io/2damdi</id>
 
+    <entry>
+        <title>Pryecto 1</title>
+        <author>
+            <name>Germán Narciso Córdoba</name>
+        </author>
+        <link href="https://narcisx.github.io/2damdi/pryecto-1.html"/>
+        <id>https://narcisx.github.io/2damdi/pryecto-1.html</id>
+
+        <updated>2025-10-14T20:44:08+02:00</updated>
+            <summary>
+                <![CDATA[
+                    Ciencia de Datos / Python blablablabablbla
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <section class="project">
+<div class="project-content">
+<p>Ciencia de Datos / Python</p>
+<h2>Pomodoro</h2>
+<p class="project-description">blablablabablbla</p>
+<div class="project-image-container"><figure class="project-image"><img loading="lazy"  src="https://via.placeholder.com/800x500" alt="Imagen del Proyecto 3" data-is-external-image="true"></figure></div>
+</div>
+</section>
+            ]]>
+        </content>
+    </entry>
+    <entry>
+        <title>PUREBAAAASDda</title>
+        <author>
+            <name>Germán Narciso Córdoba</name>
+        </author>
+        <link href="https://narcisx.github.io/2damdi/purebaaaasdda.html"/>
+        <id>https://narcisx.github.io/2damdi/purebaaaasdda.html</id>
+
+        <updated>2025-10-14T20:42:57+02:00</updated>
+            <summary>
+                <![CDATA[
+                    PUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDda
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <p>PUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDdaPUREBAAAASDda</p>
+            ]]>
+        </content>
+    </entry>
 </feed>
