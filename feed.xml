@@ -3,7 +3,7 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2025-10-15T14:39:45+02:00</updated>
+    <updated>2025-10-15T17:43:40+02:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
@@ -16,25 +16,45 @@
         </author>
         <link href="https://narcisx.github.io/2damdi/pryecto-1.html"/>
         <id>https://narcisx.github.io/2damdi/pryecto-1.html</id>
-        <media:content url="https://narcisx.github.io/2damdi/media/posts/3/Captura-de-pantalla-2025-10-15-140611.png" medium="image" />
+        <media:content url="https://narcisx.github.io/2damdi/media/posts/3/cacaca.png" medium="image" />
 
         <updated>2025-10-14T20:44:08+02:00</updated>
             <summary>
                 <![CDATA[
-                        <img src="https://narcisx.github.io/2damdi/media/posts/3/Captura-de-pantalla-2025-10-15-140611.png" alt="" />
+                        <img src="https://narcisx.github.io/2damdi/media/posts/3/cacaca.png" alt="" />
                     Pomodoro - Documentación Aquí encontraremos el paso a paso de cada prompt&hellip;
                 ]]>
             </summary>
         <content type="html">
             <![CDATA[
-                    <p><img src="https://narcisx.github.io/2damdi/media/posts/3/Captura-de-pantalla-2025-10-15-140611.png" class="type:primaryImage" alt="" /></p>
+                    <p><img src="https://narcisx.github.io/2damdi/media/posts/3/cacaca.png" class="type:primaryImage" alt="" /></p>
                 <section class="project">
 <div class="project-content">
 <h2>Pomodoro - Documentación</h2>
 <p class="project-description">Aquí encontraremos el paso a paso de cada prompt indicado.</p>
-<div class="project-image-container"> </div>
-Esto es una prueba</div>
-<a href="https://narcisx.github.io/2damdiApps/Pomodoro/index.html">adasdasd</a></section>
+<h2 data-start="139" data-end="174">🧩 <strong data-start="145" data-end="174">Resumen de peticiones ChatGPT</strong></h2>
+<p data-start="176" data-end="193">1️⃣<strong> Creación de la app:</strong><br>“Hazme una app en HTML, CSS y JavaScript sin usar frameworks en el que sea una app de descanso Pomodoro.”</p>
+<p data-start="176" data-end="193"><br>2️⃣<strong> Funciónes:</strong><br>“Traducción a otro idioma, ejercicios que puedes hacer en los descansos, etc.”</p>
+<p data-start="176" data-end="193"><br>3️⃣ <strong>Cambio en el reseteo del tiempo:</strong>“function resetTimer(){ running=false; clearInterval(timer); timer=null; addHistoryEntry(mode, 'reiniciado'); startBtn.style.display='inline-block'; pauseBtn.style.display='none'; }<br><br></p>
+<p>A partir de aqui cambié a Gemini</p>
+<h2 data-start="139" data-end="174">🧩 <strong data-start="145" data-end="174">Resumen de peticiones Gemini</strong></h2>
+<p>1️⃣ <strong>"Con este HTML, quiero que lo mejores con tus propias ideas"</strong> Implementó mejoras profesionales en la app Pomodoro, añadiendo un selector de temas, seguimiento de tareas, un título de página dinámico y notificaciones "toast", además de refactorizar todo el JavaScript.</p>
+<p>2️⃣ <strong>"Añade diferentes sonidos de alarma y un sistema de monedas"</strong> Creó un sistema de gamificación para la app. Añadió una función para ganar monedas con cada Pomodoro completado, una animación de recompensa y una tienda para desbloquear nuevos sonidos de alarma.</p>
+<p>3️⃣ <strong>"No he sabido implementarlo, ¿qué he puesto mal?"</strong> Revisó el código que no funcionaba y lo depuró. Corrigió la estructura del JavaScript, solucionó errores en el CSS y restauró elementos faltantes en el HTML.</p>
+<p>4️⃣ <strong>"El footer se ve muy alto y grande, cámbialo"</strong> Proporcionó la línea de CSS exacta para reducir el tamaño de la fuente y el margen del <code>footer</code>, haciéndolo más pequeño y discreto.</p>
+<p>5️⃣ <strong>"Mira cómo hay una sombra"</strong> Identificó un fondo degradado no deseado en la sección de recompensas y especificó qué bloque de CSS se debía eliminar para solucionarlo.</p>
+<p>6️⃣ <strong>"La app crece por culpa del historial y aparece una sombra abajo"</strong> Modificó el CSS del historial para añadirle una altura máxima (<code>max-height</code>) y una barra de <code>scroll</code> (<code>overflow-y: auto</code>), evitando que la aplicación se hiciera más grande.</p>
+<p>7️⃣ <strong>"Sigue apareciendo un cambio de color abajo"</strong> Detectó que aún quedaba un borde visible. Solucionó el problema ajustando el CSS del contenedor principal para que la app ocupara toda la altura de la pantalla y eliminó la sombra (<code>box-shadow</code>) de la tarjeta.</p>
+<p>8️⃣ <strong>"Sigue apareciendo"</strong> Proporcionó una solución definitiva aplicando un "reset" de CSS para <code>html</code> y <code>body</code>, eliminando los márgenes que el navegador añade por defecto y que causaban el problema.</p>
+<p>9️⃣ <strong>"Ahora quiero que la tienda sea un botón desplegable y poder comprar más temas. Y dame muchas monedas para probar"</strong> Transformó la tienda en un modal que se abre con un botón. Añadió nuevos temas desbloqueables (Bosque y Océano) y ajustó el código para que el saldo inicial fuera de 500 monedas.</p>
+<p>1️⃣0️⃣ <strong>"Añade funciones que usen la API de Gemini"</strong> Integró la API de Gemini en la aplicación, añadiendo un botón "✨" para desglosar tareas complejas en subtareas y un generador de citas motivacionales dinámicas.</p>
+<p>1️⃣1️⃣ <strong>"Hazme un compañero virtual amigable"</strong> Creó un personaje virtual que se adapta a los colores de cada tema. Hizo que las frases de Gemini aparecieran en un bocadillo de diálogo, como si las dijera él, y lo configuró para generar una frase nueva al hacerle clic.</p>
+<p>1️⃣2️⃣ <strong>"Quiero que lo coloques debajo de historial"</strong> Reubicó al compañero virtual desde el panel izquierdo al panel derecho, situándolo en una nueva sección justo debajo del "Historial".</p>
+<p>1️⃣3️⃣ <strong>"Mueve el botón de la tienda, pero no me estropees el programa"</strong> Ajustó la posición del botón de la tienda, moviéndolo a la esquina superior derecha del panel lateral para que no se superpusiera a ningún contenido y tuviera una ubicación fija.</p>
+<p> </p>
+<p> </p>
+</div>
+<a href="https://narcisx.github.io/2damdiApps/Pomodoro/index.html">Click aquí para ver la aplicación</a></section>
             ]]>
         </content>
     </entry>
