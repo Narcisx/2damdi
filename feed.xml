@@ -3,7 +3,7 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2025-11-04T13:37:48+01:00</updated>
+    <updated>2025-11-04T13:43:00+01:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
@@ -16,15 +16,18 @@
         </author>
         <link href="https://narcisx.github.io/2damdi/reproductor-multimedia-calendario.html"/>
         <id>https://narcisx.github.io/2damdi/reproductor-multimedia-calendario.html</id>
+        <media:content url="https://narcisx.github.io/2damdi/media/posts/4/portada.png" medium="image" />
 
         <updated>2025-11-04T13:37:48+01:00</updated>
             <summary>
                 <![CDATA[
+                        <img src="https://narcisx.github.io/2damdi/media/posts/4/portada.png" alt="" />
                     En esta documentación encontraras los prompts introducidos en gemini para crear este&hellip;
                 ]]>
             </summary>
         <content type="html">
             <![CDATA[
+                    <p><img src="https://narcisx.github.io/2damdi/media/posts/4/portada.png" class="type:primaryImage" alt="" /></p>
                 <p>En esta documentación encontraras los prompts introducidos en gemini para crear este programa.</p>
 <h3><strong>Fases del desarrollo del reproductor multimedia</strong></h3>
 <p><strong>1- Idea inicial: Reproductor de audios locales con calendario</strong><span style="font-weight: 400;"> Realizar un reproductor de audios locales con calendario. Los audios estarán en archivos locales. En el calendario se puede hacer clic y que suene un audio en un día específico. Con estas dos imágenes representativas, sigue las instrucciones de cómo hacerlo. En la pantalla 1, abre de primeras el mes en el que estamos, y en rojo el día en el que estamos. En el nombre del mes también habrá una flecha hacia atrás, donde puedes acceder a la pantalla dos, donde están todos los meses; clicando uno, puedes ver los días.</span></p>
