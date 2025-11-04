@@ -3,7 +3,7 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2025-11-04T13:43:58+01:00</updated>
+    <updated>2025-11-04T13:58:56+01:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
@@ -51,6 +51,8 @@
 <figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/4/imagen9.png" alt="" width="472" height="512" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen9-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen9-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen9-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen9-lg.png 1024w"></figure>
 <p><strong>10- Adaptación multiplataforma e integración de API (Carátulas)</strong><span style="font-weight: 400;"> Haz esta aplicación multiplataforma, para que en móvil también se pueda utilizar perfectamente. También quiero que implementes una API para poder reconocer las carátulas de las canciones e implementarlas para que se vea cuando se reproduzca la canción (cuando son vídeos no hace falta).</span></p>
 <figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/4/imagen10.png" alt="" width="370" height="512" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen10-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen10-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen10-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen10-lg.png 1024w"></figure>
+<p><strong>11- Reiteración de la funcionalidad (Clic para audio)</strong> Quiero que añadas: «En el calendario se puede hacer clic y que suene un audio en un día específico». No quites nada tampoco.</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/4/imagen11.png" alt="" width="913" height="726" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen11-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen11-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen11-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/4/responsive/imagen11-lg.png 1024w"></figure>
 <p><a href="https://narcisx.github.io/2damdi/index12.html">Haz click aquí para ver el producto final.</a></p>
             ]]>
         </content>
