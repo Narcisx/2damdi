@@ -371,10 +371,23 @@
         }
 
         /* Estados de los Días */
-        .day-item.today {
-            background-color: var(--color-today);
-            color: white;
-            font-weight: bold;
+      .day-item.today {
+            /* Mantenemos el texto en negrita */
+            font-weight: bold; 
+            
+            /* * NUEVO: Añadimos un "anillo" (box-shadow) de 3px
+             * que usa el color rojo de "hoy" (--color-today).
+             * Este anillo aparece POR FUERA de cualquier borde
+             * o fondo que personalices.
+             */
+            box-shadow: 0 0 0 3px var(--color-today);
+            
+            /* * OPCIONAL: Si quieres que "hoy" MANTENGA el fondo rojo
+             * A MENOS que tú elijas otro, descomenta la siguiente línea.
+             * Yo la dejaré comentada para que tu color personalizado
+             * siempre tenga prioridad.
+             */
+            /* background-color: var(--color-today); */
         }
         .day-item.has-audio {
             border-color: var(--color-has-audio);
