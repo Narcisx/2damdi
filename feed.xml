@@ -3,12 +3,57 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2025-11-04T14:08:28+01:00</updated>
+    <updated>2025-11-18T23:04:03+01:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
     <id>https://narcisx.github.io/2damdi</id>
 
+    <entry>
+        <title>Cinemalist</title>
+        <author>
+            <name>Germán Narciso Córdoba</name>
+        </author>
+        <link href="https://narcisx.github.io/2damdi/cinemalist.html"/>
+        <id>https://narcisx.github.io/2damdi/cinemalist.html</id>
+        <media:content url="https://narcisx.github.io/2damdi/media/posts/5/portada.png" medium="image" />
+
+        <updated>2025-11-18T22:54:16+01:00</updated>
+            <summary>
+                <![CDATA[
+                        <img src="https://narcisx.github.io/2damdi/media/posts/5/portada.png" alt="" />
+                    Esta documentación se encontraran los prompts y paso a paso de la&hellip;
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                    <p><img src="https://narcisx.github.io/2damdi/media/posts/5/portada.png" class="type:primaryImage" alt="" /></p>
+                <p>Esta documentación se encontraran los prompts y paso a paso de la creacion de esta app.</p>
+<ol>
+<li>
+<p data-path-to-node="1,0,0"><strong>Petición inicial:</strong> Actuar como experto en HTML/CSS/JS puro y crear una aplicación tipo "guía" (sobre un pueblo, películas, etc.) con modo oscuro, tarjetas y transiciones.<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/5/1.png" alt="" width="1186" height="404" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/5/responsive/1-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/1-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/1-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/1-lg.png 1024w"></figure>
+</li>
+<li>
+<p data-path-to-node="1,1,0"><strong>Definir contenido:</strong> Concretar la información: Guía sobre <strong>Pinto</strong> y una lista de <strong>10 películas favoritas</strong> (tipo Alien, Expediente Warren).<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/5/2.png" alt="" width="1352" height="584" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/5/responsive/2-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/2-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/2-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/2-lg.png 1024w"></figure>
+</li>
+<li>
+<p data-path-to-node="1,3,0"><strong>Diseño dos columnas:</strong> Cambiar la estructura a dos columnas (Pinto vs Películas), añadir <strong>degradados direccionales</strong> específicos (flechas negra y verde) y efecto de movimiento en la imagen al pasar el ratón.<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/5/3.png" alt="" width="1166" height="720" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/5/responsive/3-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/3-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/3-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/3-lg.png 1024w"></figure>
+</li>
+<li>
+<p data-path-to-node="1,5,0"><strong>Ajuste de tarjetas:</strong> Hacer las <strong>columnas más altas</strong>, imágenes más grandes que cubran el fondo y evitar espacios blancos al hacer hover. Aqui ya pasé de hacer una guia de pinto y me centre en las peliculas<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/5/4.png" alt="" width="1407" height="919" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/5/responsive/4-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/4-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/4-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/4-lg.png 1024w"></figure>
+</li>
+<li>
+<p data-path-to-node="1,9,0"><strong>Detalle completo (El gran cambio):</strong> Pedir que se muestren las <strong>puntuaciones, estrellas, sinopsis y opiniones</strong> con un diseño de tarjeta detallada (basado en tu captura), en lugar de la lista de texto simple que teníamos.<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/5/5.png" alt="" width="1383" height="950" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/5/responsive/5-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/5-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/5-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/5-lg.png 1024w"></figure>
+</li>
+<li><strong> Enriquecimiento de datos y expansión de contenido</strong> "Utilizando la nueva API (OMDb), amplía la base de datos local añadiendo más categorías de género y películas en cada una. Además, implementa una llamada a la API para obtener descripciones (sinopsis) más detalladas dinámicamente, manteniendo la estructura de código unificado."<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/5/6.png" alt="" width="1470" height="948" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/5/responsive/6-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/6-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/6-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/6-lg.png 1024w"></figure></li>
+<li><strong> Enriquecimiento de datos y expansión de contenido</strong> "Utilizando la nueva API (OMDb), amplía la base de datos local añadiendo más categorías de género y películas en cada una. Además, implementa una llamada a la API para obtener descripciones (sinopsis) más detalladas dinámicamente, manteniendo la estructura de código unificado."<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/5/7.1.png" alt="" width="1401" height="922" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/5/responsive/7.1-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/7.1-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/7.1-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/7.1-lg.png 1024w"></figure></li>
+<li>Los demas prompts son arreglos visuales o de bugs y hacerlo multiplataforma<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/5/8.png" alt="" width="544" height="814" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/5/responsive/8-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/8-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/8-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/5/responsive/8-lg.png 1024w"></figure></li>
+</ol>
+<p> </p>
+<p><a href="https://narcisx.github.io/2damdi/indexCinemalist.html">Click aqui para ver la app</a></p>
+            ]]>
+        </content>
+    </entry>
     <entry>
         <title>Reproductor Multimedia (Calendario)</title>
         <author>

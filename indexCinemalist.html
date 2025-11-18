@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMalist</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg viewBox='0 0 24 24' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill-rule='evenodd' clip-rule='evenodd' fill='%23e5e5e5' d='M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z'/%3E%3Cpath fill='%23e50914' d='M12 9a3 3 0 100 6 3 3 0 000-6zm0-7C5.5 2 0 12 0 12s5.5 10 12 10 12-10 12-10S18.5 2 12 2zm0 18c-4.97 0-9-3.58-9-8s4.03-8 9-8 9 3.58 9 8-4.03 8-9 8z'/%3E%3C/svg%3E">
+
+    <style>
+        :root {
+            /* --- Colores Premium --- */
+            --bg-color: #141414;
+            --text-color: #e5e5e5;
+            --card-bg: #1f1f1f;
+            --accent-color: #e50914;
+            --shadow-color: rgba(0, 0, 0, 0.8);
+            --star-color-full: #e50914;
+            --btn-hover: #ff1f2b;
+            --header-bg: rgba(20, 20, 20, 0.95); /* Fondo Header Oscuro */
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f5f7fa;
+            --text-color: #1a1a1a;
+            --card-bg: #ffffff;
+            --accent-color: #007bff;
+            --shadow-color: rgba(0, 0, 0, 0.15);
+            --star-color-full: #f39c12;
+            --header-bg: rgba(255, 255, 255, 0.95); /* Fondo Header Claro */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding-bottom: 4rem;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: var(--header-bg); /* Variable dinámica */
+            backdrop-filter: blur(10px);
+            padding: 0.8rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(128, 128, 128, 0.1);
+            box-shadow: 0 4px 20px var(--shadow-color);
+            transition: background 0.3s ease;
+        }
+        .container { width: 92%; max-width: 1400px; margin: 0 auto; }
+        
+        .header-content { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            height: 50px;
+            position: relative; 
+        }
+
+        /* Logo */
+        .app-logo {
+            display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; flex-shrink: 0; z-index: 2;
+        }
+        .app-logo svg { width: 35px; height: 35px; transition: transform 0.3s ease; }
+        .app-logo:hover svg { transform: scale(1.1) rotate(-5deg); }
+        .logo-primary { fill: var(--accent-color); }
+        .logo-secondary { fill: var(--text-color); }
+        h1 { font-size: 1.5rem; font-weight: 900; letter-spacing: -0.5px; color: var(--text-color); text-transform: uppercase; margin: 0; }
+        h1 span { color: var(--accent-color); }
+
+        /* --- ÁREA DERECHA (BUSCADOR + TEMA) --- */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px; 
+        }
+
+        /* --- BUSCADOR --- */
+        .search-container {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            border-radius: 30px;
+            padding: 5px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Input de Búsqueda */
+        #search-input {
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            font-size: 1.1rem;
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            transition: width 0.4s ease, opacity 0.3s;
+            outline: none;
+            font-weight: 500;
+        }
+        #search-input::placeholder { color: var(--text-color); opacity: 0.5; font-style: italic; }
+
+        /* Botón Lupa */
+        #search-trigger {
+            background: transparent; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-color); width: 35px; height: 35px;
+            transition: transform 0.2s, color 0.2s; padding: 0; flex-shrink: 0; z-index: 10;
+        }
+        #search-trigger:hover { transform: scale(1.1); color: var(--accent-color); }
+        #search-trigger svg { width: 24px; height: 24px; fill: currentColor; }
+
+        /* Botón Tema */
+        #theme-toggle { 
+            background: transparent; border: none; cursor: pointer; 
+            width: 35px; height: 35px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-color); transition: all 0.3s ease;
+            margin-left: 5px; z-index: 2;
+        }
+        #theme-toggle:hover { transform: rotate(20deg) scale(1.1); }
+        #theme-toggle svg { width: 22px; height: 22px; fill: currentColor; }
+
+
+        /* --- PANTALLAS --- */
+        .screen { display: none; animation: fadeIn 0.5s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- GRID HOME --- */
+        #main-cards-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; margin-top: 2rem;
+        }
+        .genre-card {
+            height: 240px; border-radius: 16px; position: relative; overflow: hidden; cursor: pointer;
+            background: #222; box-shadow: 0 10px 30px var(--shadow-color); transition: all 0.3s ease;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .genre-card:hover { transform: translateY(-5px) scale(1.02); border-color: var(--accent-color); }
+        .genre-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center; opacity: 0.5; transition: transform 5s ease;
+        }
+        .genre-card:hover .genre-bg { transform: scale(1.1); opacity: 0.3; }
+        .genre-overlay {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.95) 20%, transparent); padding: 1.5rem;
+        }
+        .genre-card h3 { font-size: 1.8rem; font-weight: 800; margin-bottom: 0.3rem; color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
+        .genre-card p { font-size: 0.95rem; color: #ddd; font-weight: 500; }
+
+        /* --- ESTILOS DETALLE --- */
+        .back-btn {
+            background: transparent; border: none; color: var(--text-color);
+            padding: 1.5rem 0; font-weight: 700; cursor: pointer; font-size: 1.1rem;
+            display: flex; align-items: center; gap: 10px; transition: color 0.2s;
+        }
+        .back-btn:hover { color: var(--accent-color); }
+
+        .section-header { margin-bottom: 2rem; border-bottom: 2px solid rgba(128,128,128,0.2); padding-bottom: 1rem; }
+        .section-title { font-size: 2.8rem; font-weight: 900; line-height: 1; margin-bottom: 0.5rem; }
+        .section-desc { opacity: 0.7; font-size: 1.1rem; }
+
+        .movie-list { display: flex; flex-direction: column; gap: 2.5rem; }
+
+        .movie-card {
+            display: flex; background: var(--card-bg); border-radius: 12px; overflow: hidden;
+            box-shadow: 0 5px 20px var(--shadow-color); transition: transform 0.2s;
+        }
+        .poster-area { width: 200px; flex-shrink: 0; background: #000; position: relative; }
+        .poster-area img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s; }
+        .info-area { padding: 2rem; flex-grow: 1; display: flex; flex-direction: column; }
+
+        .movie-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem; }
+        .movie-header h2 { font-size: 1.8rem; line-height: 1.1; margin-right: 1rem; font-weight: 800; }
+        
+        .meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 0.85rem; font-weight: 700; opacity: 0.8; margin-bottom: 1rem; align-items: center; }
+        .tag { background: rgba(128,128,128,0.2); padding: 4px 10px; border-radius: 6px; }
+        .tag.year { color: var(--bg-color); background: var(--text-color); }
+
+        .imdb-badge { color: #f5c518; font-weight: 900; font-size: 1.4rem; display: flex; align-items: center; gap: 5px; }
+        .imdb-badge::before { content: 'IMDb'; font-size: 0.7rem; background: #f5c518; color: black; padding: 2px 4px; border-radius: 3px; }
+
+        .my-rating { 
+            margin-bottom: 1.5rem; padding: 1rem; 
+            background: rgba(128,128,128,0.05); border-radius: 8px; border-left: 4px solid var(--accent-color);
+        }
+        .stars { font-size: 1.3rem; color: var(--star-color-full); display: block; margin-bottom: 5px; letter-spacing: 2px; }
+        .opinion { font-style: italic; opacity: 0.9; font-size: 0.95rem; }
+
+        .synopsis-container h4 { 
+            font-size: 0.85rem; text-transform: uppercase; color: var(--accent-color); margin-bottom: 0.8rem; letter-spacing: 1.5px; font-weight: 800;
+        }
+        .plot-text { line-height: 1.7; font-size: 1rem; opacity: 0.9; text-align: justify; position: relative; }
+        
+        .plot-text.clamped {
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+            mask-image: linear-gradient(to bottom, black 60%, transparent 100%); -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+        }
+        
+        .read-more-btn {
+            background: none; border: none; color: var(--accent-color); font-size: 0.9rem; cursor: pointer; 
+            margin-top: 8px; font-weight: 700; padding: 0; text-transform: uppercase; display: inline-block;
+        }
+        
+        .loading-text { font-style: italic; color: var(--accent-color); animation: blink 1s infinite; font-size: 0.9rem; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+
+        .no-results { text-align: center; padding: 3rem; font-size: 1.5rem; opacity: 0.6; }
+
+        /* =========================================
+           RESPONSIVE Y LÓGICA DE BÚSQUEDA
+           ========================================= */
+
+        /* --- ORDENADOR (PC/Tablet) --- */
+        @media (min-width: 769px) {
+            /* Buscador expandible en línea */
+            .search-container.active {
+                background: rgba(128,128,128,0.1);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                border: 1px solid rgba(128,128,128,0.2);
+                padding-right: 10px;
+            }
+            .search-container.active #search-input {
+                width: 450px; /* Ancho grande */
+                padding: 0 15px;
+                opacity: 1;
+            }
+        }
+
+        /* --- MÓVIL --- */
+        @media (max-width: 768px) {
+            .movie-card { flex-direction: column; }
+            .poster-area { width: 100%; height: 300px; }
+            .section-title { font-size: 2.2rem; }
+            
+            /* El logo siempre se muestra completo en móvil */
+            h1 { font-size: 1.3rem; } 
+            h1 span { display: inline; }
+
+            /* BUSCADOR MÓVIL: Se despliega DEBAJO del header */
+            .search-container.active {
+                position: absolute;
+                top: 100%; /* Justo debajo del header */
+                left: 0;
+                width: 100%;
+                background: var(--header-bg);
+                padding: 15px;
+                border-bottom: 1px solid var(--shadow-color);
+                box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+                z-index: 99;
+                justify-content: center;
+                animation: slideDown 0.3s ease;
+            }
+            
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+
+            .search-container.active #search-input {
+                width: 100%;
+                opacity: 1;
+                background: var(--bg-color);
+                height: 45px;
+                padding: 0 15px;
+                border-radius: 8px;
+                border: 1px solid rgba(128,128,128,0.3);
+            }
+
+            /* Ocultar la lupa DENTRO del input desplegado en móvil para no duplicar */
+            .search-container.active #search-trigger {
+                display: none; 
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container header-content">
+            <a href="#" class="app-logo" onclick="app.goHome(); return false;">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path class="logo-secondary" fill-rule="evenodd" clip-rule="evenodd" d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/>
+                    <path class="logo-primary" d="M12 9a3 3 0 100 6 3 3 0 000-6zm0-7C5.5 2 0 12 0 12s5.5 10 12 10 12-10 12-10S18.5 2 12 2zm0 18c-4.97 0-9-3.58-9-8s4.03-8 9-8 9 3.58 9 8-4.03 8-9 8z"/>
+                </svg>
+                <h1>Cine<span>Malist</span></h1>
+            </a>
+
+            <div class="header-actions">
+                <form class="search-container" id="search-container" onsubmit="app.searchMovies(event)">
+                    <input type="text" id="search-input" placeholder="Busca tu película favorita..." autocomplete="off">
+                    <button type="button" id="search-trigger" title="Buscar">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z" fill="currentColor"/>
+                            <path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z" fill="var(--accent-color)"/>
+                        </svg>
+                    </button>
+                </form>
+                
+                <button id="theme-toggle" title="Cambiar tema">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zm1-17.93c3.94.49 7 3.85 7 7.93s-3.06 7.44-7 7.93V4.07z" fill="currentColor"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section id="home-screen" class="screen active">
+            <div id="main-cards-grid"></div>
+        </section>
+
+        <section id="detail-screen" class="screen">
+            <button class="back-btn" onclick="app.goHome()">❮ Volver a la colección</button>
+            <div id="detail-content"></div>
+        </section>
+
+        <section id="search-screen" class="screen">
+            <button class="back-btn" onclick="app.goHome()">❮ Volver al inicio</button>
+            <div class="section-header">
+                <h2 class="section-title">Resultados</h2>
+                <p class="section-desc" id="search-query-display">Buscando en la base de datos global...</p>
+            </div>
+            <div id="search-results-list" class="movie-list"></div>
+        </section>
+    </main>
+
+    <script>
+        // --- CONFIGURACIÓN ---
+        const API_KEY = '4f70784a'; 
+        const MY_EMAIL = 'tu_email_aqui@gmail.com'; 
+
+        // --- DATOS DE COLECCIÓN ---
+        const movieData = {
+            terrorSciFi: { id: 'terrorSciFi', title: "Terror y Sci-Fi", desc: "Pesadillas, aliens y futuros distópicos.", list: [{ title: "Alien", year: 1979, r: 5.0, op: "El terror espacial definitivo." }, { title: "The Thing", year: 1982, r: 4.8, op: "Efectos prácticos insuperables." }, { title: "Arrival", year: 2016, r: 4.9, op: "Ciencia ficción emotiva." }, { title: "Hereditary", year: 2018, r: 4.5, op: "Pesadilla familiar." }] },
+            accion: { id: 'accion', title: "Acción", desc: "Adrenalina y héroes.", list: [{ title: "Mad Max: Fury Road", year: 2015, r: 5.0, op: "Ópera visual." }, { title: "The Dark Knight", year: 2008, r: 5.0, op: "El mejor villano." }, { title: "Gladiator", year: 2000, r: 4.7, op: "Fuerza y honor." }, { title: "John Wick", year: 2014, r: 4.2, op: "Ballet de balas." }] },
+            fantasia: { id: 'fantasia', title: "Fantasía", desc: "Magia y mundos.", list: [{ title: "The Lord of the Rings: The Return of the King", year: 2003, r: 5.0, op: "Hazaña cinematográfica." }, { title: "Pan's Labyrinth", year: 2006, r: 4.9, op: "Cuento oscuro." }, { title: "Harry Potter and the Prisoner of Azkaban", year: 2004, r: 4.3, op: "La mejor de la saga." }, { title: "The Princess Bride", year: 1987, r: 4.5, op: "Aventura perfecta." }] },
+            crimen: { id: 'crimen', title: "Crimen", desc: "Mafia y bajos fondos.", list: [{ title: "The Godfather", year: 1972, r: 5.0, op: "Cine puro." }, { title: "Pulp Fiction", year: 1994, r: 4.8, op: "Diálogos icónicos." }, { title: "Se7en", year: 1995, r: 4.7, op: "Thriller oscuro." }, { title: "Goodfellas", year: 1990, r: 4.8, op: "Vida de la mafia." }] },
+            comedia: { id: 'comedia', title: "Comedia", desc: "Risas aseguradas.", list: [{ title: "Superbad", year: 2007, r: 4.2, op: "Clásico adolescente." }, { title: "The Grand Budapest Hotel", year: 2014, r: 4.5, op: "Delicia visual." }, { title: "Shaun of the Dead", year: 2004, r: 4.4, op: "Zombies divertidos." }, { title: "The Big Lebowski", year: 1998, r: 4.3, op: "Surrealismo puro." }] },
+            drama: { id: 'drama', title: "Drama", desc: "Al corazón.", list: [{ title: "Parasite", year: 2019, r: 5.0, op: "Crítica social." }, { title: "The Shawshank Redemption", year: 1994, r: 5.0, op: "Esperanza." }, { title: "Whiplash", year: 2014, r: 4.8, op: "Tensión musical." }, { title: "Forrest Gump", year: 1994, r: 4.6, op: "Viaje inocente." }] },
+            animacion: { id: 'animacion', title: "Animación", desc: "Arte en movimiento.", list: [{ title: "Spirited Away", year: 2001, r: 5.0, op: "Imaginación sin límites." }, { title: "Spider-Man: Into the Spider-Verse", year: 2018, r: 4.9, op: "Estilo único." }, { title: "The Lion King", year: 1994, r: 4.6, op: "Épica Disney." }, { title: "Wall-E", year: 2008, r: 4.7, op: "Corazón gigante." }] },
+            belico: { id: 'belico', title: "Bélico", desc: "Conflicto y supervivencia.", list: [{ title: "Saving Private Ryan", year: 1998, r: 4.8, op: "Historia del cine." }, { title: "Apocalypse Now", year: 1979, r: 5.0, op: "Locura de guerra." }, { title: "1917", year: 2019, r: 4.5, op: "Técnicamente asombrosa." }, { title: "Full Metal Jacket", year: 1987, r: 4.6, op: "Dualidad humana." }] },
+            romance: { id: 'romance', title: "Romance", desc: "Pasión y desamor.", list: [{ title: "La La Land", year: 2016, r: 4.7, op: "Homenaje a soñadores." }, { title: "Eternal Sunshine of the Spotless Mind", year: 2004, r: 4.9, op: "Memoria y amor." }, { title: "Before Sunrise", year: 1995, r: 4.5, op: "Diálogos y química." }, { title: "Titanic", year: 1997, r: 4.4, op: "Blockbuster romántico." }] }
+        };
+
+        const app = {
+            init: () => {
+                app.renderGrid();
+                
+                // Lógica del Buscador
+                const searchContainer = document.getElementById('search-container');
+                const searchInput = document.getElementById('search-input');
+                const searchBtn = document.getElementById('search-trigger');
+
+                searchBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    // Abrir
+                    if (!searchContainer.classList.contains('active')) {
+                        searchContainer.classList.add('active');
+                        searchInput.focus();
+                        e.preventDefault();
+                    } 
+                    // Cerrar si vacío
+                    else if (searchInput.value.trim() === "") {
+                         searchContainer.classList.remove('active');
+                         e.preventDefault();
+                    }
+                    // Si hay texto, hará submit nativo
+                });
+                
+                // Cerrar clic fuera
+                document.addEventListener('click', (e) => {
+                    if (searchContainer.classList.contains('active') && !searchContainer.contains(e.target) && searchInput.value.trim() === "") {
+                        searchContainer.classList.remove('active');
+                    }
+                });
+
+                // Tema
+                const savedTheme = localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                
+                document.getElementById('theme-toggle').onclick = () => {
+                    const current = document.documentElement.getAttribute('data-theme');
+                    const next = current === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', next);
+                    localStorage.setItem('theme', next);
+                };
+            },
+
+            // --- RENDERIZADO ---
+            renderGrid: () => {
+                const grid = document.getElementById('main-cards-grid');
+                grid.innerHTML = '';
+                Object.values(movieData).forEach(genre => {
+                    const card = document.createElement('div');
+                    card.className = 'genre-card';
+                    card.innerHTML = `<div class="genre-bg" id="bg-${genre.id}"></div><div class="genre-overlay"><h3>${genre.title}</h3><p>${genre.desc}</p></div>`;
+                    card.onclick = () => app.openCategory(genre.id);
+                    grid.appendChild(card);
+                    app.fetchPoster(genre.list[0].title, genre.list[0].year, `bg-${genre.id}`, true);
+                });
+            },
+
+            // --- NAVEGACIÓN ---
+            goHome: () => {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById('home-screen').classList.add('active');
+                document.getElementById('search-container').classList.remove('active');
+                document.getElementById('search-input').value = "";
+                window.scrollTo(0,0);
+            },
+
+            openCategory: (id) => {
+                const g = Object.values(movieData).find(x => x.id === id);
+                const content = document.getElementById('detail-content');
+                content.innerHTML = `<div class="section-header"><h2 class="section-title">${g.title}</h2><p class="section-desc">${g.desc}</p></div><div class="movie-list"></div>`;
+                const list = content.querySelector('.movie-list');
+                
+                g.list.forEach((m, idx) => {
+                    const uid = `${id}-${idx}`;
+                    let starsHTML = '★'.repeat(Math.round(m.r)) + '☆'.repeat(5 - Math.round(m.r));
+                    const html = `
+                        <article class="movie-card">
+                            <div class="poster-area"><img id="img-${uid}" src="https://via.placeholder.com/200x300?text=..." alt="${m.title}"></div>
+                            <div class="info-area">
+                                <div class="movie-header"><h2>${m.title}</h2><span class="imdb-badge" id="score-${uid}">...</span></div>
+                                <div class="meta"><span class="tag year">${m.year}</span><span class="tag" id="time-${uid}">--</span><span class="tag" id="genre-${uid}">Cine</span></div>
+                                <div class="my-rating"><span class="stars">${starsHTML}</span><p class="opinion">"${m.op}"</p></div>
+                                <div class="synopsis-container"><h4>Sinopsis</h4><p class="plot-text clamped" id="plot-${uid}"><span class="loading-text">Cargando...</span></p><button class="read-more-btn" onclick="app.toggleText('plot-${uid}', this)">Leer más ▾</button></div>
+                            </div>
+                        </article>`;
+                    list.innerHTML += html;
+                    app.fetchDetails(m.title, m.year, uid, true);
+                });
+                app.switchScreen('detail-screen');
+            },
+
+            // --- BÚSQUEDA ---
+            searchMovies: async (e) => {
+                e.preventDefault();
+                const query = document.getElementById('search-input').value.trim();
+                if (!query) return;
+
+                // En móvil, cerrar la barra al buscar
+                if(window.innerWidth <= 768) {
+                    document.getElementById('search-container').classList.remove('active');
+                }
+
+                app.switchScreen('search-screen');
+                document.getElementById('search-query-display').innerText = `Resultados para: "${query}"`;
+                const list = document.getElementById('search-results-list');
+                list.innerHTML = '<p class="loading-text" style="text-align:center; font-size:1.2rem;">Buscando en OMDb...</p>';
+
+                try {
+                    const url = `https://www.omdbapi.com/?apikey=${API_KEY}&s=${encodeURIComponent(query)}&type=movie`;
+                    const res = await fetch(url);
+                    const data = await res.json();
+
+                    list.innerHTML = '';
+
+                    if (data.Response === "True") {
+                        const movies = data.Search.slice(0, 10); 
+                        movies.forEach((m, idx) => {
+                            const uid = `search-${idx}`;
+                            const html = `
+                                <article class="movie-card">
+                                    <div class="poster-area"><img id="img-${uid}" src="${m.Poster !== 'N/A' ? m.Poster : 'https://via.placeholder.com/200x300'}" alt="${m.Title}"></div>
+                                    <div class="info-area">
+                                        <div class="movie-header"><h2>${m.Title}</h2><span class="imdb-badge" id="score-${uid}">...</span></div>
+                                        <div class="meta"><span class="tag year">${m.Year}</span><span class="tag" id="time-${uid}">--</span><span class="tag" id="genre-${uid}">Cine</span></div>
+                                        <div class="synopsis-container"><h4>Sinopsis</h4><p class="plot-text clamped" id="plot-${uid}"><span class="loading-text">Cargando detalles...</span></p><button class="read-more-btn" onclick="app.toggleText('plot-${uid}', this)">Leer más ▾</button></div>
+                                    </div>
+                                </article>`;
+                            list.innerHTML += html;
+                            app.fetchDetails(m.imdbID, null, uid, false); 
+                        });
+                    } else {
+                        list.innerHTML = '<div class="no-results">❌ No se encontraron películas.</div>';
+                    }
+                } catch (error) {
+                    console.error(error);
+                    list.innerHTML = '<div class="no-results">⚠️ Error de conexión.</div>';
+                }
+            },
+
+            switchScreen: (id) => {
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                window.scrollTo(0,0);
+            },
+
+            toggleText: (id, btn) => {
+                const p = document.getElementById(id);
+                if(p.classList.contains('clamped')) { p.classList.remove('clamped'); btn.innerText = "Leer menos ▴"; }
+                else { p.classList.add('clamped'); btn.innerText = "Leer más ▾"; }
+            },
+
+            // --- API ---
+            fetchPoster: async (t, y, elId, isBg) => {
+                if (!API_KEY) return;
+                try {
+                    const res = await fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&t=${encodeURIComponent(t)}&y=${y}`);
+                    const d = await res.json();
+                    if (d.Response === "True" && d.Poster !== "N/A") {
+                        const el = document.getElementById(elId);
+                        if (isBg) el.style.backgroundImage = `url('${d.Poster}')`;
+                        else el.src = d.Poster;
+                    }
+                } catch(e){}
+            },
+
+            fetchDetails: async (searchParam, year, id, isTitleSearch) => {
+                try {
+                    let url = `https://www.omdbapi.com/?apikey=${API_KEY}&plot=full`;
+                    if (isTitleSearch) url += `&t=${encodeURIComponent(searchParam)}&y=${year}`;
+                    else url += `&i=${encodeURIComponent(searchParam)}`;
+
+                    const res = await fetch(url);
+                    const d = await res.json();
+                    
+                    if (d.Response === "True") {
+                        if(document.getElementById(`img-${id}`) && d.Poster !== "N/A" && isTitleSearch) 
+                            document.getElementById(`img-${id}`).src = d.Poster;
+                        if(document.getElementById(`score-${id}`)) document.getElementById(`score-${id}`).innerText = d.imdbRating;
+                        if(document.getElementById(`time-${id}`)) document.getElementById(`time-${id}`).innerText = d.Runtime;
+                        if(document.getElementById(`genre-${id}`)) document.getElementById(`genre-${id}`).innerText = d.Genre.split(',')[0];
+                        app.translate(d.Plot, id);
+                    }
+                } catch(e){}
+            },
+
+            translate: async (text, id) => {
+                if(!text || text === "N/A") { document.getElementById(`plot-${id}`).innerText = "Sin descripción disponible."; return; }
+                const safeText = text.length > 500 ? text.substring(0, 495) + "..." : text;
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(safeText)}&langpair=en|es&de=${MY_EMAIL}`;
+                
+                try {
+                    const res = await fetch(url);
+                    const data = await res.json();
+                    if (data.responseStatus !== 200 || (data.responseData.translatedText && data.responseData.translatedText.includes("MYMEMORY WARNING"))) {
+                        document.getElementById(`plot-${id}`).innerText = text; 
+                    } else {
+                        document.getElementById(`plot-${id}`).innerText = data.responseData.translatedText;
+                    }
+                } catch (error) { document.getElementById(`plot-${id}`).innerText = text; }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', app.init);
+    </script>
+</body>
+</html>
