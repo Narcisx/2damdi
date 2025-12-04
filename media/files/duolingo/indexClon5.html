@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Duolingo</title>
+    <link rel="icon" type="image/webp" href="duolingoIcon.webp">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           1. SISTEMA DE DISEÑO (DARK MODE VISUAL + VARIABLES ORIGINALES)
+           ========================================= */
+        :root {
+            /* Colores de Marca (Estilo Visual Nuevo) */
+            --c-success: #58cc02;     --c-success-sh: #46a302; --c-success-lt: #1b2d23;
+            --c-primary: #1cb0f6;     --c-primary-sh: #1899d6;
+            --c-chest: #ff9600;       --c-chest-sh: #cc7800;
+            --c-error: #ff4b4b;       --c-error-sh: #ea2b2b;   --c-error-lt: #451b1b;
+            --c-warning: #ffc800;     --c-gems: #2b70c9;
+            --c-purple: #ce82ff;
+
+            /* Tema Oscuro (Base) */
+            --bg-body: #131f24;       /* Fondo oscuro de la captura */
+            --bg-card: #202f36;       /* Tarjetas/Inputs */
+            --c-text: #ffffff;
+            --c-text-sub: #52656d;
+            --c-border: #37464f;
+            --c-locked: #37464f;
+            --c-input: #202f36;
+            
+            --radius: 16px;
+            --font: 'Nunito', sans-serif;
+            --nav-height: 88px;       /* Altura nav nuevo */
+            --header-height: 58px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; user-select: none; }
+        
+        body {
+            font-family: var(--font); background: var(--bg-body); color: var(--c-text);
+            margin: 0; padding: 0; height: 100vh; overflow: hidden;
+            display: flex; justify-content: center;
+        }
+
+        #app-root {
+            width: 100%; max-width: 480px; height: 100%;
+            background: var(--bg-body);
+            position: relative; display: flex; flex-direction: column;
+        }
+
+        /* =========================================
+           2. VISTAS Y ESTRUCTURA
+           ========================================= */
+        .view {
+            display: none; flex: 1; flex-direction: column;
+            overflow-y: auto; overflow-x: hidden;
+            padding-top: var(--header-height); 
+            padding-bottom: var(--nav-height);
+        }
+        .view.active { display: flex; }
+        
+        /* Full screen para Login y Lección */
+        .view.full-screen { 
+            padding: 20px; z-index: 200; position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; background: var(--bg-body); 
+            padding-top: 20px; padding-bottom: 20px;
+        }
+
+        /* =========================================
+           3. UI KIT (Botones, Inputs, Cards)
+           ========================================= */
+        .btn {
+            width: 100%; padding: 14px; border-radius: var(--radius);
+            border: 2px solid transparent; border-bottom-width: 4px;
+            font-weight: 800; text-transform: uppercase; cursor: pointer;
+            font-family: var(--font); letter-spacing: 0.8px; margin-bottom: 12px;
+            text-align: center; transition: 0.1s;
+        }
+        .btn:active { transform: translateY(4px); border-bottom-width: 0px; margin-top: 4px; }
+        
+        .btn-primary { background: var(--c-primary); color: white; border-color: var(--c-primary-sh); }
+        .btn-success { background: var(--c-success); color: white; border-color: var(--c-success-sh); }
+        .btn-outline { background: transparent; border: 2px solid var(--c-border); border-bottom-width: 4px; color: var(--c-text-sub); }
+        
+        /* --- NUEVO: Hover para los botones de idioma dentro del modal --- */
+        #lang-list .btn-outline:hover {
+            background-color: var(--c-success);
+            border-color: var(--c-success-sh);
+            color: white;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .input-group { margin-bottom: 15px; width: 100%; }
+        .input-field {
+            width: 100%; padding: 15px; border: 2px solid var(--c-border);
+            border-radius: var(--radius); background: var(--c-input);
+            color: var(--c-text); font-family: var(--font); font-size: 1rem; outline: none;
+        }
+        .input-field:focus { border-color: var(--c-primary); background: #2a3b44; }
+
+        /* FLIP CARDS (Recuperado para Práctica) */
+        .flip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .flip-card { height: 160px; perspective: 1000px; cursor: pointer; }
+        .flip-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s; transform-style: preserve-3d;
+            border-radius: var(--radius); box-shadow: 0 4px 0 var(--c-border);
+        }
+        .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+        .flip-front, .flip-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; border-radius: var(--radius);
+            border: 2px solid var(--c-border); background: var(--bg-card);
+            font-weight: 700; color: var(--c-text);
+        }
+        .flip-back { transform: rotateY(180deg); background: var(--bg-card); color: var(--c-primary); border-color: var(--c-primary); }
+
+        /* =========================================
+           4. HOME VISUALS (Header, Banner, Map)
+           ========================================= */
+        /* Header Stats */
+        .top-bar {
+            position: absolute; top: 0; left: 0; width: 100%; height: var(--header-height);
+            background: var(--bg-body); z-index: 50;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 16px; border-bottom: 2px solid var(--c-border);
+        }
+        .stat-item { display: flex; align-items: center; gap: 6px; font-weight: 800; font-size: 1rem; }
+        .stat-fire { color: #ff9600; } 
+        .stat-gem { color: #1cb0f6; }   
+        .stat-heart { color: #ff4b4b; }
+
+        /* Green Banner */
+        .section-banner {
+            background: var(--c-success); padding: 18px 16px; margin-bottom: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Map Nodes (Zig Zag) */
+        .map-container { display: flex; flex-direction: column; align-items: center; padding-bottom: 40px; }
+        
+        .map-node {
+            position: relative; width: 80px; height: 80px; margin: 8px 0;
+            display: grid; place-items: center; cursor: pointer;
+        }
+        .node-circle {
+            width: 70px; height: 70px; border-radius: 50%;
+            background: var(--c-success); box-shadow: 0 8px 0 var(--c-success-sh);
+            display: grid; place-items: center; z-index: 2; position: relative;
+        }
+        .map-node.locked .node-circle { background: var(--c-locked); box-shadow: none; pointer-events: none; }
+        .map-node.current { animation: bounce 2s infinite; }
+        .star-icon path { fill: white; }
+        .map-node.locked .star-icon path { fill: #52656d; opacity: 0.5; }
+
+        /* Búho Decoración */
+        .owl-decoration {
+            width: 90px; height: 90px; margin: 10px 0;
+            background: url("duo.webp") no-repeat center;
+            background-size: contain;
+        }
+
+        @keyframes bounce { 
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 
+            40% {transform: translateY(-8px);} 
+            60% {transform: translateY(-4px);} 
+        }
+
+        /* =========================================
+           5. GAME & NAV
+           ========================================= */
+        .option-btn {
+            background: var(--bg-card); border: 2px solid var(--c-border);
+            border-bottom-width: 4px; border-radius: 12px; padding: 16px;
+            text-align: center; font-size: 1.1rem; font-weight: 700; cursor: pointer; color: var(--c-text);
+            margin-bottom: 10px;
+        }
+        .option-btn.selected { border-color: var(--c-primary); background: rgba(28, 176, 246, 0.15); color: var(--c-primary); }
+        .option-btn.correct { border-color: var(--c-success); background: var(--c-success-lt); color: var(--c-success); }
+        .option-btn.wrong { border-color: var(--c-error); background: var(--c-error-lt); color: var(--c-error); }
+
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; max-width: 480px;
+            height: var(--nav-height); background: var(--bg-body);
+            border-top: 2px solid var(--c-border);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 100; padding-bottom: 10px;
+        }
+        .nav-item { flex: 1; display: flex; justify-content: center; align-items: center; height: 100%; cursor: pointer; opacity: 0.5; }
+        .nav-item.active { opacity: 1; }
+        .nav-icon-svg { width: 32px; height: 32px; }
+        .nav-item.active .nav-icon-svg path { fill: var(--c-success); stroke: none; }
+        .nav-item:not(.active) .nav-icon-svg path { fill: transparent; stroke: var(--c-text-sub); stroke-width: 3; stroke-linecap: round; }
+
+        /* Auth Tabs */
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
+        .auth-tab { 
+            flex: 1; padding: 10px; text-align: center; font-weight: 800; 
+            color: var(--c-text-sub); border-bottom: 2px solid var(--c-border); 
+            cursor: pointer; text-transform: uppercase;
+        }
+        .auth-tab.active { color: var(--c-primary); border-color: var(--c-primary); }
+        /* =========================================
+           6. PERFIL NUEVO (Estilos Específicos)
+           ========================================= */
+        .profile-header { display: flex; flex-direction: column; align-items: center; padding-bottom: 20px; }
+        .profile-avatar-large {
+            width: 120px; height: 120px; background: var(--c-purple); color: white;
+            font-size: 3rem; font-weight: 800; display: grid; place-items: center;
+            border-radius: 50%; margin-bottom: 15px; border: 4px solid var(--bg-body);
+        }
+        .profile-name { font-size: 1.5rem; margin: 0; color: var(--c-text); }
+        .profile-sub { color: var(--c-text-sub); font-weight: 700; margin-top: 5px; font-size: 0.9rem; }
+        
+        .profile-stats-row { 
+            display: flex; gap: 20px; margin: 20px 0; width: 100%; 
+            justify-content: center; border-bottom: 2px solid var(--c-border); padding-bottom: 20px; 
+        }
+        .p-stat-box { display: flex; flex-direction: column; align-items: center; }
+        .p-stat-val { font-weight: 800; font-size: 1.1rem; color: var(--c-text); }
+        .p-stat-label { font-size: 0.8rem; color: var(--c-text-sub); font-weight: 700; text-transform: uppercase; }
+
+        .btn-add-friends {
+            background: #1cb0f6; color: white; width: 100%; border-radius: 12px;
+            padding: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            border: none; border-bottom: 4px solid #1899d6; cursor: pointer; display: flex; 
+            justify-content: center; align-items: center; gap: 10px; margin-bottom: 20px;
+        }
+        .btn-add-friends:active { transform: translateY(4px); border-bottom: 0; margin-bottom: 24px; }
+
+        /* Banner "Completa tu perfil" */
+        .promo-card {
+            background: var(--bg-card); border: 2px solid var(--c-border); border-radius: 16px;
+            padding: 16px; display: flex; flex-direction: column; margin-bottom: 30px;
+        }
+        .promo-top { display: flex; gap: 15px; margin-bottom: 15px; align-items: center; }
+        .progress-ring { width: 50px; height: 50px; border-radius: 50%; border: 4px solid var(--c-border); border-top-color: var(--c-success); }
+        .btn-white {
+            background: white; color: var(--c-primary); border: 2px solid #e5e5e5; border-bottom-width: 4px;
+            width: 100%; font-weight: 800; padding: 10px; border-radius: 12px; text-transform: uppercase;
+        }
+
+        /* Grid de Resumen */
+        .section-title { font-size: 1.2rem; margin-bottom: 15px; margin-top: 10px; }
+        .stats-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 30px; }
+        .stat-card {
+            background: var(--bg-card); border: 2px solid var(--c-border); border-radius: 16px;
+            padding: 12px 16px; display: flex; gap: 10px; align-items: center;
+        }
+        .stat-card-icon { font-size: 1.5rem; }
+        .stat-card-info { display: flex; flex-direction: column; }
+        .stat-card-val { font-weight: 800; font-size: 1rem; color: var(--c-text); }
+        .stat-card-lbl { font-size: 0.75rem; color: var(--c-text-sub); font-weight: 700; }
+
+        /* Círculos de amigos */
+        .friends-row { display: flex; gap: 15px; justify-content: flex-start; overflow-x: auto; padding-bottom: 10px; }
+        .friend-circle-add {
+            width: 55px; height: 55px; border-radius: 50%; border: 2px dashed var(--c-border);
+            display: grid; place-items: center; color: var(--c-border); font-size: 1.5rem; font-weight: bold;
+        }
+/* =========================================
+           7. SELECTOR DE AVATARES (NUEVO)
+           ========================================= */
+        .avatar-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center;
+        }
+        .avatar-modal {
+            background: var(--bg-body); width: 90%; max-width: 400px; padding: 25px;
+            border-radius: 20px; border: 2px solid var(--c-border); text-align: center;
+        }
+        .avatar-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0;
+        }
+        .avatar-option {
+            width: 80px; height: 80px; border-radius: 50%; cursor: pointer;
+            display: grid; place-items: center; font-size: 2.5rem;
+            border: 4px solid transparent; transition: transform 0.2s;
+        }
+        .avatar-option:hover { transform: scale(1.1); }
+        .avatar-option.selected { border-color: white; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+
+        /* Botón de editar (Lápiz) sobre el avatar actual */
+        .avatar-edit-btn {
+            position: absolute; bottom: 0; right: 0; 
+            background: var(--c-primary); border: 2px solid var(--bg-body);
+            width: 35px; height: 35px; border-radius: 50%;
+            display: grid; place-items: center; cursor: pointer;
+        }
+        /* =========================================
+           8. MODAL AMIGOS Y BUSQUEDA (NUEVO)
+           ========================================= */
+        .friend-list-container { max-height: 300px; overflow-y: auto; text-align: left; }
+        .friend-item { 
+            display: flex; align-items: center; gap: 15px; padding: 12px 0; 
+            border-bottom: 1px solid var(--c-border); 
+        }
+        .friend-item:last-child { border-bottom: none; }
+        .f-avatar { 
+            width: 45px; height: 45px; border-radius: 50%; font-weight: bold; 
+            color: white; display: grid; place-items: center; font-size: 1.2rem;
+        }
+        .f-info { flex: 1; }
+        .f-name { font-weight: 800; color: var(--c-text); display: block; }
+        .f-sub { font-size: 0.8rem; color: var(--c-text-sub); }
+        /* =========================================
+           9. LEADERBOARD / LIGAS (NUEVO)
+           ========================================= */
+        .league-header {
+            text-align: center; padding: 20px;
+            border-bottom: 2px solid var(--c-border);
+            margin-bottom: 10px;
+        }
+        .league-icon { width: 80px; height: 80px; margin-bottom: 10px; }
+        
+        .leaderboard-list { display: flex; flex-direction: column; padding-bottom: 100px; }
+        
+        .rank-item {
+            display: flex; align-items: center; padding: 15px 20px;
+            gap: 15px; cursor: pointer;
+            transition: background 0.2s;
+        }
+        .rank-item:hover { background: var(--bg-card); }
+        /* Resaltar al usuario actual */
+        .rank-item.is-me { background: rgba(28, 176, 246, 0.15); border: 2px solid var(--c-primary); border-radius: 15px; margin: 5px 10px; }
+        
+        .rank-num { font-weight: 800; color: var(--c-text-sub); width: 30px; text-align: center; }
+        .rank-top { color: var(--c-warning); font-size: 1.2rem; } /* Top 3 color oro/amarillo */
+        
+        .rank-avatar { 
+            width: 45px; height: 45px; border-radius: 50%; 
+            display: grid; place-items: center; font-weight: bold; color: white;
+        }
+        .rank-name { flex: 1; font-weight: 800; color: var(--c-text); }
+        .rank-xp { font-weight: 700; color: var(--c-text-sub); }
+        /* =========================================
+           10. SEPARADOR DE ZONA (NUEVO)
+           ========================================= */
+        .promotion-separator {
+            display: flex; align-items: center; justify-content: center;
+            margin: 15px 0; position: relative;
+            opacity: 0.8;
+        }
+        .promotion-line {
+            position: absolute; width: 100%; height: 2px;
+            background-color: var(--c-success); z-index: 1;
+        }
+        .promotion-text {
+            background-color: var(--bg-body); padding: 0 15px;
+            color: var(--c-success); font-size: 0.75rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 0.5px;
+            z-index: 2; position: relative;
+        }
+        /* =========================================
+           11. MODO CLARO Y TRANSICIONES (NUEVO)
+           ========================================= */
+        
+        /* Transición suave para todos los elementos importantes */
+        body, .view, .btn, .map-node, .flip-card, .nav-item, .stat-card, .rank-item, .profile-avatar-large, .input-field {
+            transition: background-color 0.5s ease, border-color 0.5s ease, color 0.5s ease, transform 0.2s;
+        }
+
+        /* CLASE MODO CLARO (Sobrescribe las variables del root) */
+        body.light-mode {
+            --bg-body: #ffffff;       /* Fondo blanco */
+            --bg-card: #ffffff;       /* Tarjetas blancas */
+            --c-text: #3c3c3c;        /* Texto gris oscuro */
+            --c-text-sub: #afafaf;    /* Texto secundario gris claro */
+            --c-border: #e5e5e5;      /* Bordes gris claro */
+            --c-locked: #e5e5e5;      /* Color bloqueado */
+            --c-input: #f7f7f7;       /* Inputs gris muy claro */
+            --c-success-lt: #dfffd6;  /* Fondo verde claro para respuestas */
+            --c-error-lt: #ffd6d6;    /* Fondo rojo claro para errores */
+        }
+        
+        /* Ajuste específico para textos secundarios en modo claro para mejor contraste */
+        body.light-mode .profile-sub, 
+        body.light-mode .stat-card-lbl,
+        body.light-mode .p-stat-label,
+        body.light-mode .nav-item:not(.active) .nav-icon-svg path {
+            color: #afafaf; 
+            stroke: #afafaf; /* Para iconos SVG */
+        }
+
+        /* Botón de cambio de tema */
+        .theme-toggle-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 45px;
+            height: 45px;
+            background: var(--bg-card);
+            border: 2px solid var(--c-border);
+            border-bottom-width: 4px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+        .theme-toggle-btn:active {
+            border-bottom-width: 0;
+            transform: translateY(4px);
+        }
+        /* =========================================
+           12. EFECTO DE TRANSICIÓN (RIPPLE)
+           ========================================= */
+        .theme-ripple {
+            position: fixed;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.6s ease-in-out;
+        }
+        
+        /* Esta clase activa la animación */
+        .theme-ripple.animate {
+            transform: translate(-50%, -50%) scale(1);
+        }
+        /* =========================================
+           13. MINIJUEGO DE PAREJAS (MATCH)
+           ========================================= */
+        /* Pestañas para cambiar entre Flashcards y Juego */
+        .practice-tabs { display: flex; gap: 10px; padding: 0 20px 20px; }
+        .p-tab { 
+            flex: 1; text-align: center; padding: 10px; border-radius: 12px; 
+            background: var(--bg-card); border: 2px solid var(--c-border);
+            font-weight: 800; color: var(--c-text-sub); cursor: pointer;
+        }
+        .p-tab.active { 
+            background: var(--c-input); color: var(--c-primary); border-color: var(--c-primary); 
+        }
+
+        /* Grid del Juego */
+        .match-grid { 
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px; 
+            padding-bottom: 100px;
+        }
+        .match-card {
+            background: var(--bg-card); border: 2px solid var(--c-border); border-bottom-width: 4px;
+            border-radius: 16px; padding: 15px 5px; min-height: 60px;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+            font-weight: 700; cursor: pointer; color: var(--c-text); font-size: 0.95rem;
+            transition: transform 0.1s;
+        }
+        .match-card:active { transform: translateY(2px); border-bottom-width: 2px; }
+        
+        /* Estados del juego */
+        .match-card.selected { border-color: var(--c-primary); background: rgba(28, 176, 246, 0.15); color: var(--c-primary); }
+        .match-card.matched { border-color: var(--c-success); background: var(--c-success-lt); color: var(--c-success); opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+        .match-card.wrong { border-color: var(--c-error); background: var(--c-error-lt); color: var(--c-error); animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        /* Botón de audio en las flashcards */
+        .audio-btn-corner {
+            position: absolute; top: 10px; right: 10px;
+            font-size: 1.2rem; color: var(--c-text-sub); z-index: 5;
+        }
+        /* =========================================
+           14. CORRECCIÓN DE CONTRASTE (MODO CLARO)
+           ========================================= */
+        
+        /* 1. Inputs más legibles en modo claro */
+        body.light-mode .input-field {
+            background: #f0f2f5;       /* Un gris un poco más oscuro para que se note la caja */
+            color: #000000;            /* Texto NEGRO puro */
+            border-color: #ccc;
+            font-weight: 700;
+        }
+        
+        /* 2. Títulos y etiquetas dentro de los modales */
+        body.light-mode .avatar-modal h3,
+        body.light-mode .avatar-modal label,
+        body.light-mode .avatar-modal p {
+            color: #1a1a1a;            /* Casi negro para máxima legibilidad */
+        }
+
+        /* 3. Corregir el subtítulo del perfil (era muy claro) */
+        body.light-mode .profile-sub {
+            color: #666666 !important; /* Gris medio, mucho mejor que el anterior */
+        }
+
+        /* 4. Placeholder (el texto de ayuda dentro del input) */
+        body.light-mode .input-field::placeholder {
+            color: #888888;
+        }
+
+        /* 5. Asegurar que el fondo del modal sea blanco puro y tenga sombra para destacar */
+        body.light-mode .avatar-modal {
+            background: #ffffff;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-root">
+<div id="avatar-modal" class="avatar-overlay">
+            <div class="avatar-modal">
+                <h2 style="margin-top:0;">Elige tu Avatar</h2>
+                <div class="avatar-grid" id="avatar-list">
+                    </div>
+                <button class="btn btn-outline" onclick="document.getElementById('avatar-modal').style.display='none'">CANCELAR</button>
+            </div>
+</div>
+<div id="friends-list-modal" class="avatar-overlay">
+            <div class="avatar-modal" style="max-width: 350px;">
+                <h3 id="friends-modal-title" style="margin-top:0;">Amigos</h3>
+                <div id="friends-list-content" class="friend-list-container">
+                    <p style="color:var(--c-text-sub);">No hay nadie aquí aún.</p>
+                </div>
+                <button class="btn btn-outline" style="margin-top:20px;" onclick="document.getElementById('friends-list-modal').style.display='none'">CERRAR</button>
+            </div>
+</div>
+<div id="edit-profile-modal" class="avatar-overlay">
+            <div class="avatar-modal" style="max-width: 350px; text-align:left;">
+                <h3 style="margin-top:0; text-align:center;">Editar Perfil</h3>
+                
+                <label style="font-weight:bold; font-size:0.9rem; margin-bottom:5px; display:block;">Nombre</label>
+                <div class="input-group">
+                    <input type="text" id="edit-realname" class="input-field" placeholder="Tu nombre real">
+                </div>
+
+                <label style="font-weight:bold; font-size:0.9rem; margin-bottom:5px; display:block;">Biografía</label>
+                <div class="input-group">
+                    <input type="text" id="edit-bio" class="input-field" placeholder="Cuéntanos algo sobre ti..." maxlength="50">
+                </div>
+
+                <button class="btn btn-primary" onclick="App.ui.saveProfileChanges()">GUARDAR</button>
+                <button class="btn btn-outline" onclick="document.getElementById('edit-profile-modal').style.display='none'">CANCELAR</button>
+            </div>
+        </div>
+
+        <div id="add-friend-modal" class="avatar-overlay">
+            <div class="avatar-modal" style="max-width: 350px;">
+                <h3 style="margin-top:0;">Agregar Amigo</h3>
+                <p style="color:var(--c-text-sub); font-size:0.9rem;">Escribe el nombre de usuario exacto:</p>
+                
+                <form onsubmit="event.preventDefault(); App.ui.submitFollow();">
+                    <input type="text" id="search-friend-input" class="input-field" placeholder="Ej: german" style="margin-bottom:15px;">
+                    <button type="submit" class="btn btn-primary">SEGUIR</button>
+                </form>
+                
+                <p id="friend-msg" style="min-height:20px; font-weight:bold; font-size:0.9rem;"></p>
+                <button class="btn btn-outline" onclick="document.getElementById('add-friend-modal').style.display='none'">CANCELAR</button>
+            </div>
+        </div>
+        <div id="lang-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999; justify-content:center; align-items:center;">
+            <div style="background:var(--bg-card); padding:20px; border-radius:20px; width:300px; max-height:80vh; overflow-y:auto;">
+                <h3 style="text-align:center; margin-top:0;">Cursos</h3>
+                <div id="lang-list"></div>
+                <button class="btn btn-outline" style="margin-top:10px;" onclick="App.ui.toggleLang(false)">CERRAR</button>
+            </div>
+        </div>
+
+        <section id="view-auth" class="view full-screen active" style="justify-content:center; align-items:center;">
+            <div style="text-align:center; width:100%; max-width:320px;">
+                <img src="logoDuolingo.webp" alt="Duolingo Logo" style="width: 150px; height: auto; margin-bottom: 20px;">
+                
+                <h2 style="color:var(--c-success); margin-bottom:20px;">Duolingo Clone</h2>
+
+                <div class="auth-tabs">
+                    <div class="auth-tab active" id="tab-login" onclick="App.auth.switchTab('login')">INGRESAR</div>
+                    <div class="auth-tab" id="tab-register" onclick="App.auth.switchTab('register')">REGISTRAR</div>
+                </div>
+
+                <form onsubmit="event.preventDefault(); App.auth.submit();">
+                    <div class="input-group">
+                        <input type="text" id="auth-user" class="input-field" placeholder="Usuario" required autocomplete="off" autocapitalize="none">
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="auth-pass" class="input-field" placeholder="Contraseña" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="btn-auth-action">INICIAR SESIÓN</button>
+                </form>
+                <p id="auth-error" style="color:var(--c-error); font-weight:bold; min-height:20px;"></p>
+            </div>
+        </section>
+
+        <section id="view-home" class="view">
+            <header class="top-bar">
+                <div class="stat-item" onclick="App.ui.toggleLang(true)">
+                    <span id="flag-icon" style="font-size:1.5rem;">🇺🇸</span>
+                </div>
+                <div class="stat-item stat-fire">
+                    <span style="font-size:1.2rem;">🔥</span> <span id="dash-streak">0</span>
+                </div>
+                <div class="stat-item stat-gem">
+                    <span style="font-size:1.2rem;">💎</span> <span id="dash-xp">0</span>
+                </div>
+                <div class="stat-item stat-heart">
+                    <span style="font-size:1.2rem;">❤️</span> 5
+                </div>
+            </header>
+
+            <div class="section-banner">
+                <div class="section-info">
+                    <h4 style="margin:0; color:#b6f386; font-size:0.8rem; text-transform:uppercase;">Etapa 1, Sección 1</h4>
+                    <h2 style="margin:5px 0 0 0; color:white;">Primeros Pasos</h2>
+                </div>
+                <div style="background:rgba(0,0,0,0.2); padding:8px 12px; border-radius:12px; border:2px solid rgba(255,255,255,0.2);">
+                    📖
+                </div>
+            </div>
+
+            <div id="level-map-container" class="map-container"></div>
+        </section>
+<section id="view-practice" class="view">
+            <div style="padding: 0 20px 15px 20px;">
+                <h2 style="color:var(--c-primary); margin-bottom:5px;">Centro de Práctica</h2>
+                <p style="color:var(--c-text-sub); margin-top:0;">Elige tu modo de entrenamiento.</p>
+            </div>
+
+            <div class="practice-tabs">
+                <div class="p-tab active" onclick="App.practice.switchMode('cards', this)">🃏 TARJETAS</div>
+                <div class="p-tab" onclick="App.practice.switchMode('match', this)">🧩 PAREJAS</div>
+            </div>
+
+            <div id="practice-mode-cards" style="display:block;">
+                <div class="flip-grid" id="vocab-grid"></div>
+            </div>
+
+            <div id="practice-mode-match" style="display:none;">
+                <div style="padding: 0 20px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-weight:bold; color:var(--c-text-sub);">Encuentra los pares</span>
+                    <span style="font-weight:800; color:var(--c-primary);" id="match-score">0 Pts</span>
+                </div>
+                <div class="match-grid" id="match-grid"></div>
+                <div id="match-victory" style="display:none; text-align:center; padding:20px;">
+                    <h1 style="font-size:3rem; margin:0;">🎉</h1>
+                    <h3>¡Práctica Completada!</h3>
+                    <button class="btn btn-primary" onclick="App.practice.initMatchGame()">JUGAR OTRA VEZ</button>
+                </div>
+            </div>
+        </section>
+
+      <section id="view-profile" class="view">
+            <div style="padding: 20px 20px 150px 20px;">
+                <button class="theme-toggle-btn" onclick="App.ui.toggleTheme()" id="btn-theme-switch">
+                    🌙
+                </button>
+
+                <div class="profile-header">
+                    <div style="position:relative;">
+                        <div class="profile-avatar-large" id="profile-avatar" onclick="App.ui.openAvatarSelector()" style="cursor:pointer;">U</div>
+                        
+                        <div class="avatar-edit-btn" onclick="App.ui.openAvatarSelector()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+                        </div>
+                    </div>
+                    
+                   <div style="text-align:center; cursor:pointer; padding:5px; border-radius:12px; transition:background 0.2s;" 
+                         onclick="App.ui.openEditProfile()"
+                         onmouseover="this.style.background='rgba(0,0,0,0.05)'" 
+                         onmouseout="this.style.background='transparent'">
+                         
+                        <h2 class="profile-name" id="profile-name" style="display:inline-block;">Usuario</h2>
+                        <span style="font-size:1rem; color:var(--c-text-sub); margin-left:5px;">✎</span>
+                        
+                        <div class="profile-sub" id="profile-joined">Se unió en 2025</div>
+                    </div>
+                </div>
+
+                <div class="profile-stats-row">
+                    <div class="p-stat-box">
+                        <span id="profile-flag-display" style="font-size: 1.5rem;">🇺🇸</span>
+                        <span class="p-stat-label">Cursos</span>
+                    </div>
+                    <div class="p-stat-box" style="cursor:pointer;" onclick="App.ui.openFriendsList('following')">
+                        <span class="p-stat-val" id="profile-following">0</span>
+                        <span class="p-stat-label">Siguiendo</span>
+                    </div>
+                    <div class="p-stat-box" style="cursor:pointer;" onclick="App.ui.openFriendsList('followers')">
+                        <span class="p-stat-val" id="profile-followers">0</span>
+                        <span class="p-stat-label">Seguidores</span>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-add-friends" onclick="document.getElementById('add-friend-modal').style.display='flex'; document.getElementById('friend-msg').textContent='';">
+                        <span>👤+</span> AGREGA AMIGOS
+                    </button>
+                </div>
+
+             <div class="promo-card">
+                    <div class="promo-top">
+                        <div class="progress-ring" style="border:4px solid var(--c-border); display:grid; place-items:center;">
+                             <span style="font-size:1.2rem;">📝</span>
+                        </div> 
+                        <div>
+                            <h3 style="margin:0; font-size:1rem;">Completa tu perfil</h3>
+                            <p style="margin:5px 0 0 0; font-size:0.8rem; color:var(--c-text-sub);">Añade tu nombre y biografía</p>
+                        </div>
+                    </div>
+                    <button class="btn-white" onclick="App.ui.openEditProfile()">CONTINUAR</button>
+                </div>
+
+                <h3 class="section-title">Resumen</h3>
+                
+                <div class="stats-grid-2">
+                    <div class="stat-card">
+                        <div class="stat-card-icon">🔥</div>
+                        <div class="stat-card-info">
+                            <span class="stat-card-val" id="profile-streak-card">0</span>
+                            <span class="stat-card-lbl">días de racha</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon">⚡</div>
+                        <div class="stat-card-info">
+                            <span class="stat-card-val" id="profile-xp-card">0</span>
+                            <span class="stat-card-lbl">EXP totales</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon">🏆</div>
+                        <div class="stat-card-info">
+                            <span class="stat-card-val">Oro</span>
+                            <span class="stat-card-lbl">división actual</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-card-icon" id="profile-flag-card">🇺🇸</div>
+                        <div class="stat-card-info">
+                            <span class="stat-card-val" id="profile-level-card">1</span>
+                            <span class="stat-card-lbl">Nivel actual</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="section-title">Rachas entre amigos</h3>
+                <div class="friends-row" style="margin-bottom: 40px;">
+                    <div class="friend-circle-add">+</div>
+                    <div class="friend-circle-add">+</div>
+                    <div class="friend-circle-add">+</div>
+                    <div class="friend-circle-add">+</div>
+                    <div class="friend-circle-add">+</div>
+                </div>
+
+                <h3 class="section-title" style="margin-top:30px; display:flex; justify-content:space-between;">
+                    Medallas mensuales <span style="color:var(--c-primary); font-size:0.8rem; cursor:pointer;">VER TODOS</span>
+                </h3>
+                <div style="background:var(--bg-card); height:100px; border-radius:16px; border:2px solid var(--c-border); display:flex; align-items:center; justify-content:center; color:var(--c-text-sub);">
+                    🔒 Diciembre
+                </div>
+
+                <button class="btn btn-outline" style="margin-top:30px;" onclick="App.auth.logout()">CERRAR SESIÓN</button>
+            </div>
+        </section>
+
+        <section id="view-lesson" class="view full-screen" style="z-index:300;">
+            <header style="display:flex; align-items:center; margin-bottom:20px;">
+                <button onclick="App.game.quit()" style="background:none; border:none; font-size:1.5rem; color:var(--c-text-sub); cursor:pointer;">✕</button>
+                <div style="flex:1; margin:0 15px; background:var(--c-border); height:16px; border-radius:10px; overflow:hidden;">
+                    <div id="lesson-progress" style="width:0%; height:100%; background:var(--c-success); transition:width 0.5s;"></div>
+                </div>
+                <div style="font-weight:bold; color:var(--c-error);">❤️ ∞</div>
+            </header>
+
+            <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width:600px; margin:0 auto; width:100%;">
+                <h2 id="lesson-question" style="margin-bottom:30px; text-align:center;">Cargando...</h2>
+                <div id="lesson-options" style="display:grid; gap:10px;"></div>
+            </div>
+
+            <div style="position:fixed; bottom:0; left:0; width:100%; padding:20px; background:var(--bg-body); border-top:2px solid var(--c-border);">
+                <div id="feedback-msg" style="display:none; margin-bottom:10px; font-weight:bold; text-align:center;"></div>
+                <button id="btn-check" class="btn btn-success" onclick="App.game.check()">COMPROBAR</button>
+                <button id="btn-next" class="btn btn-primary" onclick="App.game.next()" style="display:none;">CONTINUAR</button>
+            </div>
+        </section>
+<section id="view-leaderboard" class="view">
+            <div class="league-header">
+                <img src="copa.webp" class="league-icon" alt="Escudo">
+                <h2 style="margin:0; color:var(--c-text);">División Bronce</h2>
+                <p style="margin:5px 0 0 0; color:var(--c-text-sub);">Los 5 mejores avanzan de nivel</p>
+            </div>
+            
+            <div id="leaderboard-list" class="leaderboard-list">
+                <p style="text-align:center; padding:20px;">Cargando clasificación...</p>
+            </div>
+        </section>
+       <nav class="bottom-nav" id="main-nav" style="display:none;">
+            <div class="nav-item active" onclick="App.router.go('home', this)">
+                <svg class="nav-icon-svg" viewBox="0 0 40 40"><path d="M20,5 L35,16 L35,35 L25,35 L25,25 L15,25 L15,35 L5,35 L5,16 Z" /></svg>
+            </div>
+            <div class="nav-item" onclick="App.router.go('leaderboard', this); App.ui.loadLeaderboard();">
+                <svg class="nav-icon-svg" viewBox="0 0 24 24" style="width:28px; height:28px;">
+                    <path d="M12 2L4 5V11C4 16.55 7.4 21.74 12 23C16.6 21.74 20 16.55 20 11V5L12 2ZM12 4.3L18 6.55V11C18 15.28 15.5 19.34 12 20.45C8.5 19.34 6 15.28 6 11V6.55L12 4.3Z" fill="currentColor"/>
+                </svg>
+            </div>
+            <div class="nav-item" onclick="App.router.go('practice', this)">
+                <svg class="nav-icon-svg" viewBox="0 0 40 40"><path d="M10,10 h20 v20 h-20 Z M15,15 v10 M20,15 v10 M25,15 v10" fill="none"/></svg>
+            </div>
+            <div class="nav-item" onclick="App.router.go('profile', this)">
+                <svg class="nav-icon-svg" viewBox="0 0 40 40"><circle cx="20" cy="15" r="8" fill="none"/><path d="M5,35 Q20,25 35,35" fill="none"/></svg>
+            </div>
+        </nav>
+
+    </div>
+
+<script type="module">
+        // Configuración de Avatares (Estilo Duolingo)
+        const AVATARS = {
+            'default': { color: '#ce82ff', icon: '👤' },
+            'duo':     { color: '#58cc02', icon: '🦉' },
+            'bear':    { color: '#ff9600', icon: '🐻' },
+            'girl':    { color: '#ff4b4b', icon: '👧' },
+            'boy':     { color: '#1cb0f6', icon: '👦' },
+            'fox':     { color: '#cd143c', icon: '🦊' },
+            'robot':   { color: '#2b70c9', icon: '🤖' },
+            'cat':     { color: '#202f36', icon: '🐱' },
+            'star':    { color: '#ffc800', icon: '⭐' } 
+        };  
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Configuración Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbjOddeT9-VNSUoXuFfwjn2Mcg-PCfpU0",
+            authDomain: "duolingo-clone-js.firebaseapp.com",
+            projectId: "duolingo-clone-js",
+            storageBucket: "duolingo-clone-js.firebasestorage.app",
+            messagingSenderId: "537892154680",
+            appId: "1:537892154680:web:c7fd4e732cc2cce085e5cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const USERS_COLL = `artifacts/duolingo-clone-v3/public/data/users`;
+
+        // ==========================================
+        // DATA STORE
+        // ==========================================
+        const DB = {
+            courses: {
+           en: {
+                    id: 'en', name: 'Inglés', flag: '🇺🇸',
+                    vocab: [
+                        { t: "Apple", n: "Manzana" }, { t: "Water", n: "Agua" },
+                        { t: "Bread", n: "Pan" }, { t: "Milk", n: "Leche" },
+                        { t: "Boy", n: "Niño" }, { t: "Girl", n: "Niña" },
+                        { t: "Man", n: "Hombre" }, { t: "Woman", n: "Mujer" },
+                        { t: "Cat", n: "Gato" }, { t: "Dog", n: "Perro" },
+                        { t: "Red", n: "Rojo" }, { t: "Blue", n: "Azul" },
+                        { t: "Hello", n: "Hola" }, { t: "Goodbye", n: "Adiós" }
+                    ],
+                    lessons: [
+                        // --- NIVEL 0: Comida Básica ---
+                        [
+                            // CORREGIDO: Opciones en español
+                            {q:"Traduce 'Water'", opts:["Pan","Agua","Leche"], c:1}, 
+                            {q:"'Manzana' en Inglés", opts:["Apple","Pear","Car"], c:0},
+                            // CORREGIDO: Opciones en inglés
+                            {q:"Traduce 'Leche'", opts:["Milk", "Water", "Coffee"], c:0}
+                        ],
+                        // --- NIVEL 1: Personas ---
+                        [
+                            {q:"I am a boy", opts:["Soy un niño","Soy una niña","Hola"], c:0}, 
+                            {q:"Traduce 'Woman'", opts:["Hombre","Mujer","Niña"], c:1},
+                            {q:"She is a girl", opts:["Ella es una mujer", "Él es un niño", "Ella es una niña"], c:2}
+                        ],
+                        // --- NIVEL 2: Saludos ---
+                        [
+                            {q:"Traduce 'Hello'", opts:["Adiós","Gracias","Hola"], c:2}, 
+                            {q:"Good morning", opts:["Buenos días","Buenas noches","Chau"], c:0},
+                            {q:"Traduce 'Goodbye'", opts:["Hi", "Goodbye", "Please"], c:1}
+                        ],
+                        // --- NIVEL 3: Animales y Colores ---
+                        [
+                            {q:"Traduce 'Gato'", opts:["Dog","Cat","Fish"], c:1}, 
+                            {q:"Dog", opts:["Perro","Gato","Ave"], c:0},
+                            {q:"Traduce 'Red'", opts:["Azul","Rojo","Verde"], c:1},
+                            {q:"The car is blue", opts:["El coche es rojo", "El coche es azul", "El coche es rápido"], c:1}
+                        ]
+                    ]
+                },
+               fr: {
+                    id: 'fr', name: 'Francés', flag: '🇫🇷',
+                    vocab: [
+                        { t: "Eau", n: "Agua" }, { t: "Pomme", n: "Manzana" },
+                        { t: "Pain", n: "Pan" }, { t: "Lait", n: "Leche" },
+                        { t: "Chat", n: "Gato" }, { t: "Chien", n: "Perro" },
+                        { t: "Rouge", n: "Rojo" }, { t: "Bleu", n: "Azul" },
+                        { t: "Garçon", n: "Niño" }, { t: "Fille", n: "Niña" },
+                        { t: "Bonjour", n: "Hola" }, { t: "Merci", n: "Gracias" }
+                    ],
+                    lessons: [
+                        // --- NIVEL 0: Comida ---
+                        [
+                            {q:"Traduce 'Eau'", opts:["Pan","Agua","Leche"], c:1}, 
+                            {q:"'Pomme' en español", opts:["Manzana","Pera","Coche"], c:0},
+                            {q:"Traduce 'Pain'", opts:["Vino", "Pan", "Queso"], c:1}
+                        ],
+                        // --- NIVEL 1: Género y Colores ---
+                        [
+                            {q:"Je suis un garçon", opts:["Soy un niño","Soy una niña","Hola"], c:0}, 
+                            {q:"Rouge", opts:["Azul","Rojo","Verde"], c:1},
+                            {q:"La pomme est rouge", opts:["La manzana es roja", "La manzana es verde", "Como una manzana"], c:0}
+                        ],
+                        // --- NIVEL 2: Animales ---
+                        [
+                            {q:"Traduce 'Gato'", opts:["Chien", "Oiseau", "Chat"], c:2},
+                            {q:"Le chien", opts:["El gato", "El perro", "El caballo"], c:1},
+                            {q:"Un chat noir", opts:["Un gato negro", "Un perro blanco", "Un gato rojo"], c:0}
+                        ],
+                         // --- NIVEL 3: Cortesía ---
+                        [
+                            {q:"Bonjour", opts:["Adiós", "Hola", "Buenas noches"], c:1},
+                            {q:"Merci beaucoup", opts:["Muchas gracias", "De nada", "Por favor"], c:0}
+                        ]
+                    ]
+                },
+            de: {
+                    id: 'de', name: 'Alemán', flag: '🇩🇪',
+                    vocab: [
+                        { t: "Wasser", n: "Agua" }, { t: "Brot", n: "Pan" },
+                        { t: "Milch", n: "Leche" }, { t: "Apfel", n: "Manzana" },
+                        { t: "Katze", n: "Gato" }, { t: "Hund", n: "Perro" },
+                        { t: "Rot", n: "Rojo" }, { t: "Blau", n: "Azul" },
+                        { t: "Hallo", n: "Hola" }, { t: "Tschüss", n: "Adiós" },
+                        { t: "Danke", n: "Gracias" }, { t: "Bitte", n: "Por favor" }
+                    ],
+                    lessons: [
+                        // --- NIVEL 0 (Básico) ---
+                        [
+                            // CORREGIDO: Opciones en español
+                            {q:"Traduce 'Wasser'", opts:["Pan","Agua","Leche"], c:1}, 
+                            {q:"'Manzana' en Alemán", opts:["Apfel","Birne","Auto"], c:0},
+                            {q:"Traduce 'Leche'", opts:["Milch", "Wasser", "Bier"], c:0}
+                        ],
+                        
+                        // --- NIVEL 1 (Saludos y Animales) ---
+                        [
+                            {q:"Traduce 'Gato'", opts:["Hund","Katze","Fisch"], c:1}, 
+                            {q:"Hallo", opts:["Hola","Adiós","Gracias"], c:0},
+                            {q:"¿Cómo se dice 'Perro'?", opts:["Katze", "Maus", "Hund"], c:2},
+                            {q:"Traduce 'Adiós'", opts:["Hallo", "Tschüss", "Bitte"], c:1}
+                        ],
+                        
+                        // --- NIVEL 2 (Colores y Cortesía) ---
+                        [
+                            {q:"Danke", opts:["Por favor","Gracias","No"], c:1}, 
+                            {q:"Rot", opts:["Azul","Rojo","Verde"], c:1},
+                            {q:"Traduce 'Azul'", opts:["Blau", "Gelb", "Rot"], c:0},
+                            {q:"Bitte", opts:["Gracias", "Hola", "Por favor"], c:2}
+                        ]
+                    ]
+                }
+            },
+            findUser: async (username) => {
+                try {
+                    const d = await getDoc(doc(db, USERS_COLL, username));
+                    return d.exists() ? d.data() : null;
+                } catch (e) { console.error(e); return null; }
+            },
+            saveUser: async (user) => {
+                await setDoc(doc(db, USERS_COLL, user.username), user);
+            },
+            followUser: async (myUsername, targetUsername) => {
+                if(myUsername === targetUsername) throw new Error("No puedes seguirte a ti mismo.");
+                const me = await DB.findUser(myUsername);
+                const target = await DB.findUser(targetUsername);
+                if(!target) throw new Error("Usuario no encontrado.");
+                
+                if(!me.following) me.following = [];
+                if(!target.followers) target.followers = [];
+                if(me.following.includes(targetUsername)) throw new Error("Ya sigues a este usuario.");
+
+                me.following.push(targetUsername);
+                target.followers.push(myUsername);
+
+                await DB.saveUser(me);
+                await DB.saveUser(target);
+                return me; 
+            },
+        };
+
+        // ==========================================
+        // APP CONTROLLER
+        // ==========================================
+       // ==========================================
+        // APP CONTROLLER
+        // ==========================================
+        const App = {
+            
+            // --- NUEVO: Función auxiliar para calcular corazones por tiempo ---
+            calculateHearts: (user) => {
+                // Si no tiene datos de corazones, inicializar (para usuarios viejos)
+                if (user.hearts === undefined) user.hearts = 5;
+                if (!user.lastHeartRegen) user.lastHeartRegen = Date.now();
+
+                const maxHearts = 5;
+                const regenTime = 60000; // 1 minuto en milisegundos
+
+                if (user.hearts < maxHearts) {
+                    const now = Date.now();
+                    const diff = now - user.lastHeartRegen;
+                    
+                    // Cuántos corazones se han regenerado en este tiempo
+                    const heartsGenerated = Math.floor(diff / regenTime);
+
+                    if (heartsGenerated > 0) {
+                        user.hearts = Math.min(maxHearts, user.hearts + heartsGenerated);
+                        // Reseteamos el contador de tiempo al remanente
+                        // (Para no perder segundos sueltos, restamos el tiempo usado)
+                        user.lastHeartRegen = now - (diff % regenTime);
+                    }
+                } else {
+                    // Si está lleno, actualizamos el timestamp para que no acumule tiempo infinito
+                    user.lastHeartRegen = Date.now();
+                }
+                return user;
+            },
+            
+
+          state: {
+                currentUser: null,
+                authMode: 'login',
+                currentLang: 'en',
+                heartTimerInterval: null // <--- AÑADIR ESTO
+            },
+            init: async () => {
+                // 1. CARGAR TEMA (Si lo tienes implementado)
+                const savedTheme = localStorage.getItem('duo_theme_v3');
+                if (savedTheme === 'light') document.body.classList.add('light-mode');
+
+                await signInAnonymously(auth);
+                App.ui.renderLangList();
+                
+                const lastUser = localStorage.getItem('duo_session_v3');
+                if (lastUser) {
+                    const btn = document.getElementById('btn-auth-action');
+                    if(btn) btn.textContent = "Reconectando...";
+                    let user = await DB.findUser(lastUser);
+                    
+                    if (user) {
+                        // Calcular regeneración al entrar
+                        user = App.calculateHearts(user);
+                        // Guardar el estado actualizado si cambió
+                        await DB.saveUser(user);
+                        App.auth.startSession(user);
+                    } else {
+                        localStorage.removeItem('duo_session_v3');
+                    }
+                }
+            },
+            // --- AUTH LOGIC ---
+            auth: {
+                switchTab: (mode) => {
+                    App.state.authMode = mode;
+                    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+                    document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+                    const btn = document.getElementById('btn-auth-action');
+                    btn.textContent = mode === 'login' ? 'INICIAR SESIÓN' : 'CREAR CUENTA';
+                    btn.classList.toggle('btn-primary', mode === 'login');
+                    btn.classList.toggle('btn-success', mode === 'register');
+                    document.getElementById('auth-error').textContent = '';
+                },
+                submit: async () => {
+                    const userVal = document.getElementById('auth-user').value.trim().toLowerCase();
+                    const passVal = document.getElementById('auth-pass').value.trim();
+                    const errorMsg = document.getElementById('auth-error');
+                    if(!userVal || !passVal) return errorMsg.textContent = "Faltan datos";
+                    document.getElementById('btn-auth-action').textContent = "Procesando...";
+                    try {
+                        const existing = await DB.findUser(userVal);
+                        if (App.state.authMode === 'register') {
+                            if (existing) throw new Error("Usuario ya existe");
+                            const newUser = { 
+                                username: userVal, password: passVal, xp: 0, streak: 1, level: 0, 
+                                progress: { en: 0, fr: 0, de: 0 },
+                                following: [], followers: [] // Inicializamos arrays vacíos
+                            };
+                            await DB.saveUser(newUser);
+                            App.auth.startSession(newUser);
+                        } else {
+                            if (!existing) throw new Error("Usuario no encontrado");
+                            if (existing.password !== passVal) throw new Error("Contraseña incorrecta");
+                            App.auth.startSession(existing);
+                        }
+                    } catch (e) {
+                        errorMsg.textContent = e.message;
+                        document.getElementById('btn-auth-action').textContent = App.state.authMode === 'login' ? 'INICIAR SESIÓN' : 'CREAR CUENTA';
+                    }
+                },
+                startSession: (user) => {
+                    App.state.currentUser = user;
+                    localStorage.setItem('duo_session_v3', user.username);
+                    document.getElementById('view-auth').classList.remove('active');
+                    document.getElementById('main-nav').style.display = 'flex';
+                    App.ui.updateDashboard();
+                    App.ui.renderVocab();
+                    App.ui.updateProfile();
+                    App.router.go('home');
+                },
+                logout: () => {
+                    localStorage.removeItem('duo_session_v3');
+                    location.reload();
+                }
+            },
+
+            // --- GAME ENGINE ---
+         // --- GAME ENGINE (MODIFICADO CON VIDAS) ---
+            game: {
+                data: [], qIndex: 0, levelId: 0, selected: null,
+                lessonLives: 2, // Vidas locales del nivel
+
+                start: async (levelIndex) => {
+                    // 1. Verificar si tiene vidas globales para jugar
+                    const user = App.state.currentUser;
+                    // Recalculamos por si pasó un minuto mientras estaba en el menú
+                    const updatedUser = App.calculateHearts(user); 
+                    
+                    if (updatedUser.hearts <= 0) {
+                        alert("💔 ¡No te quedan vidas! Espera un minuto para recargar.");
+                        return;
+                    }
+
+                    const course = DB.courses[App.state.currentLang];
+                    if (!course.lessons[levelIndex]) { alert("Nivel en construcción"); return; }
+                    
+                    App.game.levelId = levelIndex;
+                    App.game.data = course.lessons[levelIndex];
+                    App.game.qIndex = 0;
+                    App.game.lessonLives = 2; // Reiniciar las 2 oportunidades
+                    
+                    // Actualizar UI del Header de Lección
+                    const heartUI = document.querySelector('#view-lesson header div:last-child');
+                    heartUI.innerHTML = `❤️ ${App.game.lessonLives}`;
+                    heartUI.style.color = "var(--c-error)";
+
+                    document.getElementById('lesson-progress').style.width = '0%';
+                    App.router.go('lesson');
+                    App.game.renderQ();
+                },
+
+                renderQ: () => {
+                    const q = App.game.data[App.game.qIndex];
+                    document.getElementById('lesson-question').textContent = q.q;
+                    const grid = document.getElementById('lesson-options');
+                    grid.innerHTML = '';
+                    
+                    document.getElementById('btn-check').style.display = 'block';
+                    document.getElementById('btn-check').disabled = true;
+                    document.getElementById('btn-next').style.display = 'none';
+                    document.getElementById('feedback-msg').style.display = 'none';
+                    App.game.selected = null;
+
+                    q.opts.forEach((opt, idx) => {
+                        const btn = document.createElement('div');
+                        btn.className = 'option-btn';
+                        btn.textContent = opt;
+                        btn.onclick = () => {
+                            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                            btn.classList.add('selected');
+                            App.game.selected = idx;
+                            document.getElementById('btn-check').disabled = false;
+                        };
+                        grid.appendChild(btn);
+                    });
+                },
+
+                check: async () => {
+                    const q = App.game.data[App.game.qIndex];
+                    const isCorrect = App.game.selected === q.c;
+                    const btns = document.querySelectorAll('.option-btn');
+                    const feed = document.getElementById('feedback-msg');
+
+                    btns[App.game.selected].classList.remove('selected');
+                    
+                    if (isCorrect) {
+                        // --- RESPUESTA CORRECTA ---
+                        btns[App.game.selected].classList.add('correct');
+                        feed.textContent = "¡BIEN HECHO!";
+                        feed.style.color = "var(--c-success)";
+                        
+                        feed.style.display = 'block';
+                        document.getElementById('btn-check').style.display = 'none';
+                        document.getElementById('btn-next').style.display = 'block';
+                        
+                        const pct = ((App.game.qIndex + 1) / App.game.data.length) * 100;
+                        document.getElementById('lesson-progress').style.width = `${pct}%`;
+
+                    } else {
+                        // --- RESPUESTA INCORRECTA ---
+                        btns[App.game.selected].classList.add('wrong');
+                        btns[q.c].classList.add('correct');
+                        
+                        // Restar vida LOCAL del nivel
+                        App.game.lessonLives--;
+                        
+                        // Actualizar UI visualmente
+                        const heartUI = document.querySelector('#view-lesson header div:last-child');
+                        heartUI.innerHTML = `❤️ ${App.game.lessonLives}`;
+                        heartUI.style.animation = "shake 0.5s"; // Efecto visual
+                        setTimeout(()=> heartUI.style.animation = "", 500);
+
+                        if (App.game.lessonLives > 0) {
+                            // Aún le queda 1 oportunidad en el nivel
+                            feed.textContent = `¡Incorrecto! Te queda ${App.game.lessonLives} vida.`;
+                            feed.style.color = "var(--c-error)";
+                            feed.style.display = 'block';
+                            
+                            // Permitimos continuar a la siguiente pregunta aunque haya fallado (Duolingo style)
+                            // OJO: Si quieres que repitan LA MISMA pregunta, la lógica sería distinta.
+                            // Aquí asumimos que avanzan pero con riesgo de Game Over.
+                            document.getElementById('btn-check').style.display = 'none';
+                            document.getElementById('btn-next').style.display = 'block';
+
+                        } else {
+                            // --- GAME OVER DEL NIVEL ---
+                            feed.textContent = "💔 ¡Nivel fallido! Pierdes 1 corazón global.";
+                            feed.style.color = "var(--c-error)";
+                            feed.style.display = 'block';
+                            document.getElementById('btn-check').style.display = 'none';
+                            
+                            // Restar vida GLOBAL y salir
+                            const u = App.state.currentUser;
+                            if(u.hearts > 0) u.hearts--;
+                            u.lastHeartRegen = Date.now(); // Resetear timer de regeneración si bajó de 5
+                            
+                            await DB.saveUser(u);
+                            App.ui.updateDashboard(); // Actualizar corazones en home
+
+                            // Botón para salir
+                            const btnNext = document.getElementById('btn-next');
+                            btnNext.textContent = "SALIR";
+                            btnNext.style.backgroundColor = "var(--c-error)";
+                            btnNext.style.borderColor = "var(--c-error-sh)";
+                            btnNext.onclick = () => App.router.go('home'); // Sobrescribir onclick temporalmente
+                            btnNext.style.display = 'block';
+                        }
+                    }
+                },
+
+                next: async () => {
+                    // Restaurar botón (por si era Game Over)
+                    const btnNext = document.getElementById('btn-next');
+                    btnNext.textContent = "CONTINUAR";
+                    btnNext.className = "btn btn-primary"; // Restaurar color azul
+                    btnNext.onclick = () => App.game.next(); // Restaurar función original
+
+                    App.game.qIndex++;
+                    if (App.game.qIndex < App.game.data.length) {
+                        App.game.renderQ();
+                    } else {
+                        // Nivel completado con éxito
+                        const u = App.state.currentUser;
+                        const curLang = App.state.currentLang;
+                        
+                        u.xp += 15;
+                        
+                        if (!u.progress) u.progress = {};
+                        const currentLangLevel = u.progress[curLang] !== undefined ? u.progress[curLang] : (u.level || 0);
+
+                        if(currentLangLevel === App.game.levelId) {
+                            u.progress[curLang] = currentLangLevel + 1;
+                            if(curLang === 'en') u.level = currentLangLevel + 1;
+                        }
+
+                        await DB.saveUser(u);
+                        App.ui.updateDashboard();
+                        App.ui.updateProfile();
+                        App.router.go('home');
+                    }
+                },
+
+                quit: () => {
+                    if(confirm("¿Salir? Perderás el progreso.")) App.router.go('home');
+                }
+            },
+            // --- NUEVO: LÓGICA DE PRÁCTICA Y AUDIO ---
+            practice: {
+                selectedCard: null,
+                score: 0,
+                matchesFound: 0,
+                totalPairs: 6, // Cuántas parejas jugar por ronda
+
+                // Cambiar entre pestañas
+                switchMode: (mode, tabEl) => {
+                    document.querySelectorAll('.p-tab').forEach(t => t.classList.remove('active'));
+                    tabEl.classList.add('active');
+
+                    document.getElementById('practice-mode-cards').style.display = mode === 'cards' ? 'block' : 'none';
+                    document.getElementById('practice-mode-match').style.display = mode === 'match' ? 'block' : 'none';
+
+                    if(mode === 'match') App.practice.initMatchGame();
+                    if(mode === 'cards') App.ui.renderVocab(); // Recargar tarjetas
+                },
+
+                // Iniciar juego de parejas
+                initMatchGame: () => {
+                    const grid = document.getElementById('match-grid');
+                    const vocab = DB.courses[App.state.currentLang].vocab;
+                    
+                    document.getElementById('match-victory').style.display = 'none';
+                    grid.style.display = 'grid';
+                    App.practice.score = 0;
+                    App.practice.matchesFound = 0;
+                    document.getElementById('match-score').textContent = "0 Pts";
+                    grid.innerHTML = '';
+
+                    // 1. Seleccionar palabras al azar (máximo 6 pares)
+                    // Mezclar vocabulario completo y coger los primeros 6
+                    const shuffledVocab = [...vocab].sort(() => 0.5 - Math.random()).slice(0, App.practice.totalPairs);
+                    
+                    // 2. Crear las cartas (Original y Traducción) separadas
+                    let cards = [];
+                    shuffledVocab.forEach((w, idx) => {
+                        // Carta Idioma Extranjero
+                        cards.push({ id: idx, text: w.t, type: 'term', pairId: idx, lang: App.state.currentLang });
+                        // Carta Español
+                        cards.push({ id: idx, text: w.n, type: 'def', pairId: idx, lang: 'es-ES' });
+                    });
+
+                    // 3. Mezclar las cartas para que no estén juntas
+                    cards.sort(() => 0.5 - Math.random());
+
+                    // 4. Renderizar
+                    cards.forEach(card => {
+                        const el = document.createElement('div');
+                        el.className = 'match-card';
+                        el.textContent = card.text;
+                        el.dataset.pair = card.pairId;
+                        
+                        el.onclick = () => App.practice.handleCardClick(el, card);
+                        grid.appendChild(el);
+                    });
+                },
+
+                handleCardClick: (el, cardData) => {
+                    // Si ya está seleccionada, matcheada o esperando animación, ignorar
+                    if(el.classList.contains('matched') || el.classList.contains('selected') || document.querySelector('.match-card.wrong')) return;
+
+                    // Reproducir audio al hacer click
+                    App.practice.speak(cardData.text, cardData.lang);
+
+                    el.classList.add('selected');
+
+                    if(!App.practice.selectedCard) {
+                        // Primera carta seleccionada
+                        App.practice.selectedCard = el;
+                    } else {
+                        // Segunda carta: Comprobar Match
+                        const firstEl = App.practice.selectedCard;
+                        const matchId1 = firstEl.dataset.pair;
+                        const matchId2 = el.dataset.pair;
+
+                        if(matchId1 === matchId2) {
+                            // ¡CORRECTO!
+                            firstEl.classList.add('matched');
+                            el.classList.add('matched');
+                            App.practice.selectedCard = null;
+                            App.practice.score += 10;
+                            App.practice.matchesFound++;
+                            document.getElementById('match-score').textContent = App.practice.score + " Pts";
+
+                            // Verificar victoria
+                            if(App.practice.matchesFound >= App.practice.totalPairs) {
+                                setTimeout(() => {
+                                    document.getElementById('match-grid').style.display = 'none';
+                                    document.getElementById('match-victory').style.display = 'block';
+                                    // Dar XP al usuario
+                                    const u = App.state.currentUser;
+                                    u.xp += 10;
+                                    DB.saveUser(u);
+                                    App.ui.updateProfile(); // Actualizar UI de arriba
+                                }, 800);
+                            }
+
+                        } else {
+                            // INCORRECTO
+                            el.classList.add('wrong');
+                            firstEl.classList.add('wrong');
+                            
+                            // Quitar selección después de un momento
+                            setTimeout(() => {
+                                el.classList.remove('selected', 'wrong');
+                                firstEl.classList.remove('selected', 'wrong');
+                                App.practice.selectedCard = null;
+                            }, 600);
+                        }
+                    }
+                },
+
+                // --- FUNCIÓN DE TEXT-TO-SPEECH (AUDIO) ---
+                speak: (text, langCode) => {
+                    if(!window.speechSynthesis) return;
+                    
+                    // Mapeo simple de códigos de idioma para el navegador
+                    const langMap = {
+                        'en': 'en-US', 'es': 'es-ES', 'fr': 'fr-FR', 'de': 'de-DE'
+                    };
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    // Si el codigo es 'es-ES' lo usa, si no busca en el mapa
+                    utterance.lang = langCode.length > 2 ? langCode : (langMap[langCode] || 'en-US');
+                    utterance.rate = 0.9; // Un poco más lento para aprender
+                    
+                    window.speechSynthesis.cancel(); // Parar lo anterior
+                    window.speechSynthesis.speak(utterance);
+                }
+            },
+
+            // --- UI & ROUTER ---
+           router: {
+                go: (view, navEl) => {
+                    document.querySelectorAll('.view').forEach(v => v.classList.remove('active', 'full-screen'));
+                    const target = document.getElementById('view-'+view);
+                    
+                    if (view === 'auth' || view === 'lesson') {
+                        target.classList.add('active', 'full-screen');
+                    } else {
+                        target.classList.add('active');
+                    }
+                    
+                    if(navEl) {
+                        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                        navEl.classList.add('active');
+                    }
+                }
+            },
+
+            ui: {
+                // --- NUEVO: ABRIR EDITOR DE PERFIL ---
+                openEditProfile: () => {
+                    const u = App.state.currentUser;
+                    document.getElementById('edit-realname').value = u.displayName || '';
+                    document.getElementById('edit-bio').value = u.bio || '';
+                    document.getElementById('edit-profile-modal').style.display = 'flex';
+                },
+
+                // --- NUEVO: GUARDAR CAMBIOS ---
+                saveProfileChanges: async () => {
+                    const name = document.getElementById('edit-realname').value.trim();
+                    const bio = document.getElementById('edit-bio').value.trim();
+                    
+                    if(!name) return alert("Por favor, escribe un nombre.");
+
+                    const u = App.state.currentUser;
+                    u.displayName = name; // Guardamos Nombre Real
+                    u.bio = bio;          // Guardamos Bio
+
+                    // Guardar en Firebase
+                    await DB.saveUser(u);
+                    
+                    // Actualizar y cerrar
+                    App.ui.updateProfile();
+                    document.getElementById('edit-profile-modal').style.display = 'none';
+                },
+                // --- NUEVO: CAMBIAR MODO CLARO/OSCURO ---
+               // --- NUEVO: CAMBIAR MODO CON EFECTO RIPPLE ---
+               // --- NUEVO: TEMPORIZADOR DE CORAZONES ---
+                startHeartTimer: () => {
+                    // Limpiar intervalo anterior para no tener duplicados
+                    if (App.state.heartTimerInterval) clearInterval(App.state.heartTimerInterval);
+
+                    const updateTimer = () => {
+                        const u = App.state.currentUser;
+                        const timerEl = document.getElementById('heart-timer-display');
+                        const countEl = document.getElementById('heart-count-val');
+                        
+                        // Seguridad por si cambiamos de vista
+                        if (!timerEl || !u) return;
+
+                        if (u.hearts >= 5) {
+                            timerEl.textContent = ""; // Lleno, no mostramos tiempo
+                            if(countEl) countEl.style.color = "var(--c-text)"; // Color normal
+                            return;
+                        }
+
+                        // Calcular tiempo restante
+                        const now = Date.now();
+                        const regenTime = 60000; // 1 minuto
+                        
+                        // Tiempo que ha pasado desde la última regeneración parcial
+                        const timePassed = now - u.lastHeartRegen;
+                        
+                        // Tiempo que falta para el SIGUIENTE corazón
+                        // (Si ha pasado más de 1 min pero no hemos actualizado la UI, esto lo corrige visualmente)
+                        let timeLeft = regenTime - (timePassed % regenTime);
+
+                        // Si por algún casual el cálculo da negativo o ya toca regenerar
+                        if (timePassed >= regenTime) {
+                            // Recalculamos el usuario real y actualizamos UI
+                            const updatedUser = App.calculateHearts(u);
+                            App.state.currentUser = updatedUser;
+                            DB.saveUser(updatedUser);
+                            
+                            if(countEl) countEl.textContent = updatedUser.hearts;
+                            
+                            if(updatedUser.hearts >= 5) {
+                                timerEl.textContent = "";
+                                return;
+                            }
+                            // Resetear el visual
+                            timeLeft = regenTime;
+                        }
+
+                        // Formatear a MM:SS (aunque solo usaremos segundos normalmente)
+                        const seconds = Math.floor(timeLeft / 1000);
+                        const strSeconds = seconds < 10 ? "0" + seconds : seconds;
+                        
+                        timerEl.textContent = `${strSeconds}s`;
+                        if(countEl) countEl.style.color = "var(--c-error)"; // Poner el número en rojo si falta vida
+                    };
+
+                    // Ejecutar inmediatamente y luego cada segundo
+                    updateTimer();
+                    App.state.heartTimerInterval = setInterval(updateTimer, 1000);
+                },
+                toggleTheme: () => {
+                    const body = document.body;
+                    const btn = document.getElementById('btn-theme-switch');
+                    const isCurrentlyLight = body.classList.contains('light-mode');
+                    
+                    // 1. Crear el círculo temporal
+                    const ripple = document.createElement('div');
+                    ripple.className = 'theme-ripple';
+                    
+                    // 2. Decidir el color del círculo (Color del tema AL QUE VAMOS)
+                    // Si es Light -> Vamos a Dark (Color oscuro)
+                    // Si es Dark -> Vamos a Light (Color blanco)
+                    ripple.style.background = isCurrentlyLight ? '#131f24' : '#ffffff';
+
+                    // 3. Posicionar el círculo en el centro del botón
+                    const rect = btn.getBoundingClientRect();
+                    const x = rect.left + rect.width / 2;
+                    const y = rect.top + rect.height / 2;
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+
+                    // 4. Calcular el tamaño necesario para cubrir toda la pantalla
+                    // Usamos la hipotenusa (teorema de pitágoras) para asegurar que cubra las esquinas
+                    const w = window.innerWidth;
+                    const h = window.innerHeight;
+                    const size = Math.sqrt(w * w + h * h) * 2; // Multiplicamos por 2 para asegurar cobertura
+                    ripple.style.width = `${size}px`;
+                    ripple.style.height = `${size}px`;
+
+                    document.body.appendChild(ripple);
+
+                    // 5. Activar la animación (con un pequeño delay para que el navegador procese el DOM)
+                    requestAnimationFrame(() => {
+                        ripple.classList.add('animate');
+                    });
+
+                    // 6. Cambiar el tema JUSTO cuando el círculo ha llenado la pantalla (600ms)
+                    setTimeout(() => {
+                        body.classList.toggle('light-mode');
+                        
+                        // Actualizar icono
+                        const isNowLight = body.classList.contains('light-mode');
+                        btn.textContent = isNowLight ? '☀️' : '🌙';
+                        
+                        // Guardar
+                        localStorage.setItem('duo_theme_v3', isNowLight ? 'light' : 'dark');
+
+                        // 7. Eliminar el círculo (ya no hace falta, el body ya cambió de color detrás)
+                        // Le damos un pequeño fade out por si acaso, o lo quitamos directo
+                        ripple.style.opacity = '0';
+                        setTimeout(() => ripple.remove(), 200); // Esperar un poco antes de borrar del DOM
+                    }, 600); // Este tiempo debe coincidir con el del CSS (0.6s)
+                },
+                toggleLang: (s) => document.getElementById('lang-modal').style.display = s ? 'flex' : 'none',
+                renderLangList: () => {
+                    const c = document.getElementById('lang-list');
+                    c.innerHTML = '';
+                    Object.values(DB.courses).forEach(crs => {
+                        const b = document.createElement('div');
+                        b.className = 'btn btn-outline';
+                        b.innerHTML = `${crs.flag} ${crs.name}`;
+                        b.style.marginBottom = '10px';
+                        b.onclick = () => { 
+                            App.state.currentLang = crs.id; 
+                            App.ui.toggleLang(false);
+                            App.ui.updateDashboard();
+                            App.ui.renderVocab();
+                        };
+                        c.appendChild(b);
+                      });
+                },
+                updateDashboard: () => {
+                     const user = App.calculateHearts(App.state.currentUser);
+                    
+                    const curLang = App.state.currentLang;
+                    const course = DB.courses[curLang];
+                    
+                    document.getElementById('flag-icon').textContent = course.flag;
+                    document.getElementById('dash-streak').textContent = user.streak;
+                    document.getElementById('dash-xp').textContent = user.xp;
+
+                    const map = document.getElementById('level-map-container');
+                    map.innerHTML = '';
+                  // --- CAMBIO AQUÍ: Mostrar corazones y PREPARAR EL TIMER ---
+                    const heartsEl = document.querySelector('.top-bar .stat-heart');
+                    if(heartsEl) {
+                        // Creamos una estructura con IDs para poder actualizar solo el texto luego
+                        heartsEl.innerHTML = `
+                            <span style="font-size:1.2rem;">❤️</span> 
+                            <span id="heart-count-val">${user.hearts}</span>
+                            <small id="heart-timer-display" style="font-size:0.8rem; margin-left:5px; width:35px; display:inline-block; text-align:left;"></small>
+                        `;
+                    }
+                    
+                    // Iniciamos el contador
+                    App.ui.startHeartTimer();
+                    let userLevel = 0;
+                    if (user.progress && user.progress[curLang] !== undefined) {
+                        userLevel = user.progress[curLang];
+                    } else if (user.level !== undefined && curLang === 'en') {
+                        userLevel = user.level;
+                    }
+
+                    const mapNodes = [
+                        { type: 'star' }, { type: 'star' }, 
+                        { type: 'chest' }, { type: 'star' }, { type: 'owl' }, 
+                        { type: 'star' }, { type: 'trophy' }
+                    ];
+
+                    mapNodes.forEach((nodeObj, i) => {
+                        const offset = Math.sin(i) * 50;
+                        const levelIndex = (nodeObj.type === 'star' || nodeObj.type === 'trophy') ? i : -1;
+                        let isLocked = true, isCurrent = false, isDone = false;
+
+                        if (i < userLevel) isDone = true;
+                        if (i === userLevel) isCurrent = true;
+                        if (i <= userLevel) isLocked = false;
+
+                        const el = document.createElement('div');
+                        el.style.transform = `translateX(${offset}px)`;
+
+                        if (nodeObj.type === 'owl') {
+                            el.className = 'owl-decoration';
+                            el.style.marginBottom = '20px';
+                        } else if (nodeObj.type === 'chest') {
+                            el.className = `map-node ${isLocked ? 'locked' : ''}`;
+                            el.innerHTML = `<div class="node-circle" style="background:var(--c-chest); box-shadow:0 8px 0 var(--c-chest-sh); border-radius:16px; width:60px; height:55px;">🎁</div>`;
+                            el.onclick = async () => {
+                                if(isLocked) { alert("¡Nivel bloqueado! Completa los anteriores."); } 
+                                else {
+                                    alert("¡Has abierto el cofre! +50 Gemas 💎");
+                                    const u = App.state.currentUser;
+                                    u.xp += 50;
+                                    if(userLevel === i) {
+                                        if(!u.progress) u.progress = {};
+                                        u.progress[curLang] = i + 1;
+                                        if(curLang === 'en') u.level = i + 1;
+                                    } 
+                                    await DB.saveUser(u);
+                                    App.ui.updateDashboard();
+                                    App.ui.updateProfile();
+                                }
+                            };
+                        } else {
+                            el.className = `map-node ${isLocked ? 'locked' : ''} ${isCurrent ? 'current' : ''}`;
+                            el.innerHTML = `
+                                ${isCurrent ? '<div style="position:absolute; top:-30px; font-size:1.5rem; animation:bounce 2s infinite;">👑</div>' : ''}
+                                <div class="node-circle">
+                                    <svg class="star-icon" viewBox="0 0 24 24" width="30" height="30"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    ${isDone ? '<div style="position:absolute; bottom:-12px; display:flex; gap:2px; font-size:10px;">⭐⭐⭐</div>' : ''}
+                                </div>`;
+                            el.onclick = () => {
+                                if(isLocked) alert("Nivel Bloqueado");
+                                else App.game.start(userLevel);
+                            };
+                        }
+                        map.appendChild(el);
+                    });
+                },
+                renderVocab: () => {
+                    const grid = document.getElementById('vocab-grid');
+                    grid.innerHTML = '';
+                    const words = DB.courses[App.state.currentLang].vocab;
+                    words.forEach(w => {
+                        const c = document.createElement('div');
+                        c.className = 'flip-card';
+                        c.innerHTML = `<div class="flip-inner"><div class="flip-front">${w.t}</div><div class="flip-back">${w.n}</div></div>`;
+                        c.onclick = function() { this.classList.toggle('flipped'); };
+                        grid.appendChild(c);
+                    });
+                },
+
+                // --- FUNCIONES MOVIDAS DENTRO DE UI ---
+                submitFollow: async () => {
+                    const targetName = document.getElementById('search-friend-input').value.trim().toLowerCase();
+                    const msg = document.getElementById('friend-msg');
+                    const btn = document.querySelector('#add-friend-modal button[type="submit"]');
+                    if(!targetName) return;
+                    btn.disabled = true;
+                    btn.textContent = "...";
+                    try {
+                        const updatedUser = await DB.followUser(App.state.currentUser.username, targetName);
+                        App.state.currentUser = updatedUser;
+                        App.ui.updateProfile();
+                        msg.style.color = "var(--c-success)";
+                        msg.textContent = `¡Ahora sigues a ${targetName}!`;
+                        document.getElementById('search-friend-input').value = "";
+                    } catch (e) {
+                        msg.style.color = "var(--c-error)";
+                        msg.textContent = e.message;
+                    }
+                    btn.disabled = false;
+                    btn.textContent = "SEGUIR";
+                },
+
+                openFriendsList: async (type) => { 
+                    const modal = document.getElementById('friends-list-modal');
+                    const content = document.getElementById('friends-list-content');
+                    const title = document.getElementById('friends-modal-title');
+                    const u = App.state.currentUser;
+                    modal.style.display = 'flex';
+                    title.textContent = type === 'following' ? 'Siguiendo' : 'Seguidores';
+                    content.innerHTML = '<p style="text-align:center;">Cargando...</p>';
+                    const list = (type === 'following' ? u.following : u.followers) || [];
+                    if (list.length === 0) {
+                        content.innerHTML = '<p style="color:var(--c-text-sub); text-align:center;">Lista vacía.</p>';
+                        return;
+                    }
+                    content.innerHTML = '';
+                    for (const name of list) {
+                        const userData = await DB.findUser(name);
+                        if(userData) {
+                            const avKey = userData.avatar || 'default';
+                            const avData = (window.AVATARS && window.AVATARS[avKey]) ? window.AVATARS[avKey] : {color:'#ccc', icon:'?'};
+                            const div = document.createElement('div');
+                            div.className = 'friend-item';
+                            div.innerHTML = `
+                                <div class="f-avatar" style="background:${avData.color}">
+                                    ${avKey === 'default' ? userData.username[0].toUpperCase() : avData.icon}
+                                </div>
+                                <div class="f-info">
+                                    <span class="f-name">${userData.username}</span>
+                                    <span class="f-sub">${userData.xp} EXP Total</span>
+                                </div>`;
+                            content.appendChild(div);
+                        }
+                    }
+                },
+
+                openAvatarSelector: () => {
+                    const modal = document.getElementById('avatar-modal');
+                    const grid = document.getElementById('avatar-list');
+                    const currentAvatar = App.state.currentUser.avatar || 'default';
+                    grid.innerHTML = '';
+                    modal.style.display = 'flex';
+                    Object.keys(AVATARS).forEach(key => {
+                        const data = AVATARS[key];
+                        const el = document.createElement('div');
+                        el.className = `avatar-option ${key === currentAvatar ? 'selected' : ''}`;
+                        el.style.background = data.color;
+                        el.textContent = data.icon;
+                        el.onclick = () => App.ui.saveAvatar(key);
+                        grid.appendChild(el);
+                    });
+                },
+
+                saveAvatar: async (avatarKey) => {
+                    const u = App.state.currentUser;
+                    u.avatar = avatarKey;
+                    await DB.saveUser(u);
+                    App.ui.updateProfile();
+                    document.getElementById('avatar-modal').style.display = 'none';
+                },
+updateProfile: () => {
+                    const u = App.state.currentUser;
+                    const curLang = App.state.currentLang;
+                    const course = DB.courses[curLang];
+                    
+                    // 1. Avatar
+                    const avatarKey = u.avatar || 'default';
+                    const avatarData = AVATARS[avatarKey] ? AVATARS[avatarKey] : AVATARS['default'];
+                    const avatarEl = document.getElementById('profile-avatar');
+                    avatarEl.style.background = avatarData.color;
+                    avatarEl.textContent = (avatarKey === 'default') ? u.username.charAt(0).toUpperCase() : avatarData.icon;
+
+                    // 2. Textos (Nombre Real vs Usuario)
+                    // Si tiene displayName, lo usamos de título. Si no, usamos el username.
+                    const displayTitle = u.displayName || u.username;
+                    document.getElementById('profile-name').textContent = displayTitle;
+                    
+                    // Subtítulo: Mostramos el @usuario y la Bio si existe
+                    let subText = `@${u.username}`;
+                    if (u.bio) subText += ` • ${u.bio}`;
+                    // Si no tiene bio ni nombre real, mostramos la fecha como antes
+                    if (!u.bio && !u.displayName) subText += " • Se unió en 2025";
+                    
+                    document.getElementById('profile-joined').textContent = subText;
+
+                    // 3. Stats
+                    document.getElementById('profile-flag-display').textContent = course.flag;
+                    document.getElementById('profile-streak-card').textContent = u.streak;
+                    document.getElementById('profile-xp-card').textContent = u.xp;
+                    document.getElementById('profile-flag-card').textContent = course.flag;
+
+                    // Contadores amigos
+                    const followingCount = (u.following && u.following.length) || 0;
+                    const followersCount = (u.followers && u.followers.length) || 0;
+                    document.getElementById('profile-following').textContent = followingCount;
+                    document.getElementById('profile-followers').textContent = followersCount;
+
+                    // Nivel
+                    let currentLevel = 0;
+                    if (u.progress && u.progress[curLang] !== undefined) {
+                        currentLevel = u.progress[curLang];
+                    } else if (u.level && curLang === 'en') {
+                        currentLevel = u.level;
+                    }
+                    document.getElementById('profile-level-card').textContent = currentLevel;
+
+                    // --- NUEVO: OCULTAR TARJETA SI EL PERFIL ESTÁ COMPLETO ---
+                    // Consideramos completo si tiene Nombre Real Y Bio
+                    const promoCard = document.querySelector('.promo-card');
+                    if (promoCard) {
+                        if (u.displayName && u.bio) {
+                            promoCard.style.display = 'none';
+                        } else {
+                            promoCard.style.display = 'flex';
+                            
+                            // Calcular progreso del anillo visualmente (simple)
+                            let percent = 33; // Base por tener cuenta
+                            if (u.displayName) percent += 33;
+                            if (u.bio) percent += 34;
+                            
+                            // Actualizar gráfico del anillo (CSS conic-gradient)
+                            const ring = promoCard.querySelector('.progress-ring');
+                            if(ring) ring.style.background = `conic-gradient(var(--c-success) ${percent}%, transparent 0)`;
+                        }
+                    }
+                },
+                // --- NUEVO: CARGAR CLASIFICACIÓN ---
+             // --- CORRECCIÓN: CARGAR CLASIFICACIÓN CON AVATARES ---
+              // --- CARGAR CLASIFICACIÓN CON SEPARADOR ---
+                loadLeaderboard: async () => {
+                    const listEl = document.getElementById('leaderboard-list');
+                    const myUser = App.state.currentUser.username;
+                    
+                    listEl.innerHTML = '<p style="text-align:center; padding:20px;">Cargando clasificación...</p>';
+
+                    try {
+                        const q = query(collection(db, USERS_COLL), orderBy("xp", "desc"), limit(50));
+                        const querySnapshot = await getDocs(q);
+                        
+                        listEl.innerHTML = '';
+                        let rank = 1;
+
+                        querySnapshot.forEach((doc) => {
+                            const u = doc.data();
+                            const isMe = u.username === myUser;
+                            
+                            const avKey = u.avatar || 'default'; 
+                            const avData = AVATARS[avKey] ? AVATARS[avKey] : AVATARS['default'];
+                            
+                            let rankDisplay = rank;
+                            if(rank === 1) rankDisplay = '🥇';
+                            if(rank === 2) rankDisplay = '🥈';
+                            if(rank === 3) rankDisplay = '🥉';
+
+                            const row = document.createElement('div');
+                            row.className = `rank-item ${isMe ? 'is-me' : ''}`;
+                            
+                            const iconContent = avKey === 'default' ? u.username.charAt(0).toUpperCase() : avData.icon;
+
+                            row.innerHTML = `
+                                <div class="rank-num ${rank <= 3 ? 'rank-top' : ''}">${rankDisplay}</div>
+                                <div class="rank-avatar" style="background:${avData.color}">
+                                    ${iconContent}
+                                </div>
+                                <div class="rank-name">${u.username} ${isMe ? '(Tú)' : ''}</div>
+                                <div class="rank-xp">${u.xp} XP</div>
+                            `;
+                            
+                            if(isMe && rank > 6) {
+                                setTimeout(() => row.scrollIntoView({behavior: "smooth", block: "center"}), 500);
+                            }
+
+                            listEl.appendChild(row);
+
+                            // --- NUEVO: INSERTAR SEPARADOR DESPUÉS DEL 5TO LUGAR ---
+                            if (rank === 5) {
+                                const sep = document.createElement('div');
+                                sep.className = 'promotion-separator';
+                                sep.innerHTML = `
+                                    <div class="promotion-line"></div>
+                                    <div class="promotion-text">Avanzan de división</div>
+                                `;
+                                listEl.appendChild(sep);
+                            }
+
+                            rank++;
+                        });
+
+                    } catch (e) {
+                        console.error(e);
+                        listEl.innerHTML = '<p style="text-align:center; color:var(--c-error);">Error cargando liga.</p>';
+                    }
+                },
+            }
+        };
+
+        window.App = App;
+        window.onload = App.init;
+    </script>
+</body>
+</html>
