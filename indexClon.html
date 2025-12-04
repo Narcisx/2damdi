@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Duolingo Clone - Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* =========================================
+           1. SISTEMA DE DISEÑO (VARIABLES)
+           ========================================= */
+        :root {
+            /* Colores Principales */
+            --c-success: #58cc02; --c-success-sh: #46a302; --c-success-lt: #d7ffb8;
+            --c-error: #ff4b4b;   --c-error-sh: #ea2b2b;   --c-error-lt: #ffdfe0;
+            --c-primary: #1cb0f6; --c-primary-sh: #1899d6;
+            --c-warning: #ffc800; --c-warning-sh: #e5b400;
+            --c-purple: #ce82ff;  --c-purple-sh: #a568cc;
+            
+            /* Tema Base (Light) */
+            --bg-body: #ffffff;
+            --bg-card: #ffffff;
+            --c-text: #3c3c3c;
+            --c-text-sub: #777777;
+            --c-border: #e5e5e5;
+            --c-input: #f7f7f7;
+            --c-locked: #e5e5e5;
+            
+            --radius: 16px;
+            --font: 'Nunito', sans-serif;
+            --nav-height: 70px;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #131f24;
+            --bg-card: #202f36;
+            --c-text: #ffffff;
+            --c-text-sub: #999;
+            --c-border: #37464f;
+            --c-input: #202f36;
+            --c-locked: #37464f;
+            --c-success-lt: #1b2d23;
+        }
+
+        /* =========================================
+           2. RESET & LAYOUT
+           ========================================= */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
+        body {
+            font-family: var(--font); background: var(--bg-body); color: var(--c-text);
+            margin: 0; padding: 0; height: 100vh; overflow: hidden;
+            display: flex; justify-content: center;
+        }
+
+        #app-root {
+            width: 100%; max-width: 480px; height: 100%;
+            background: var(--bg-body);
+            position: relative; display: flex; flex-direction: column;
+        }
+
+        /* Vistas (Pantallas) */
+        .view {
+            display: none; flex: 1; flex-direction: column;
+            overflow-y: auto; padding: 20px; padding-bottom: 90px; /* Espacio para nav */
+            animation: fadeOnly 0.3s ease;
+        }
+        .view.active { display: flex; }
+        .view.full-screen { padding-bottom: 20px; z-index: 50; background: var(--bg-body); position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+
+        @keyframes fadeOnly { from { opacity: 0; } to { opacity: 1; } }
+
+        /* =========================================
+           3. UI KIT (Botones, Inputs, Cards)
+           ========================================= */
+        /* Botones 3D */
+        .btn {
+            width: 100%; padding: 14px; border-radius: var(--radius);
+            border: 2px solid transparent; border-bottom-width: 5px;
+            font-weight: 800; text-transform: uppercase; cursor: pointer;
+            transition: 0.1s; display: inline-block; text-align: center;
+            font-family: var(--font); letter-spacing: 0.5px;
+        }
+        .btn:active { transform: translateY(4px); border-bottom-width: 0px; margin-top: 4px; }
+        
+        .btn-primary { background: var(--c-primary); color: white; border-color: var(--c-primary-sh); }
+        .btn-success { background: var(--c-success); color: white; border-color: var(--c-success-sh); }
+        .btn-outline { background: transparent; border: 2px solid var(--c-border); border-bottom-width: 4px; color: var(--c-text-sub); }
+        
+        .input-group { margin-bottom: 15px; }
+        .input-field {
+            width: 100%; padding: 15px; border: 2px solid var(--c-border);
+            border-radius: var(--radius); background: var(--c-input);
+            color: var(--c-text); font-family: var(--font); font-size: 1rem;
+        }
+        .input-field:focus { border-color: var(--c-primary); background: var(--bg-card); }
+
+        /* =========================================
+           4. COMPONENTES INTERACTIVOS
+           ========================================= */
+        
+        /* A. FLIP CARDS (Vocabulario) */
+        .flip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .flip-card {
+            background-color: transparent; height: 160px; perspective: 1000px; cursor: pointer;
+        }
+        .flip-inner {
+            position: relative; width: 100%; height: 100%; text-align: center;
+            transition: transform 0.6s; transform-style: preserve-3d;
+            border-radius: var(--radius); box-shadow: 0 4px 0 var(--c-border);
+        }
+        .flip-card.flipped .flip-inner { transform: rotateY(180deg); }
+        
+        .flip-front, .flip-back {
+            position: absolute; width: 100%; height: 100%;
+            -webkit-backface-visibility: hidden; backface-visibility: hidden;
+            display: flex; align-items: center; justify-content: center;
+            flex-direction: column; border-radius: var(--radius);
+            border: 2px solid var(--c-border); background: var(--bg-card);
+            font-weight: 700;
+        }
+        .flip-back { transform: rotateY(180deg); background: #ddf4ff; color: var(--c-primary); border-color: var(--c-primary); }
+
+        /* B. ACORDEÓN (Persiana) - Guía */
+        .accordion { margin-bottom: 10px; border: 2px solid var(--c-border); border-radius: var(--radius); overflow: hidden; background: var(--bg-card); }
+        .accordion-header {
+            width: 100%; padding: 15px; background: var(--bg-card);
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: 700; cursor: pointer; border: none; color: var(--c-text);
+        }
+        .accordion-content {
+            max-height: 0; overflow: hidden; transition: max-height 0.3s ease;
+            padding: 0 15px; background: var(--bg-card); color: var(--c-text-sub); border-top: 1px solid transparent;
+        }
+        .accordion.open .accordion-content { max-height: 300px; padding-bottom: 15px; border-top-color: var(--c-border); }
+        .chevron { transition: transform 0.3s; }
+        .accordion.open .chevron { transform: rotate(180deg); }
+
+        /* C. CARRUSEL (Logros) */
+        .carousel-container {
+            display: flex; overflow-x: auto; gap: 15px; padding: 10px 0 20px 0;
+            scroll-snap-type: x mandatory; -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .carousel-container::-webkit-scrollbar { display: none; }
+        .carousel-item {
+            flex: 0 0 140px; scroll-snap-align: center;
+            background: var(--bg-card); border: 2px solid var(--c-border);
+            border-radius: var(--radius); padding: 15px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+        }
+        .badge-icon { font-size: 3rem; margin-bottom: 10px; }
+
+        /* =========================================
+           5. ESTRUCTURA APP
+           ========================================= */
+        /* Login Tabs */
+        .auth-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .auth-tab { flex: 1; padding: 10px; text-align: center; font-weight: 700; color: var(--c-text-sub); border-bottom: 2px solid var(--c-border); cursor: pointer; }
+        .auth-tab.active { color: var(--c-primary); border-color: var(--c-primary); }
+
+        /* Bottom Nav */
+        .bottom-nav {
+            position: absolute; bottom: 0; width: 100%; height: var(--nav-height);
+            background: var(--bg-card); border-top: 2px solid var(--c-border);
+            display: flex; justify-content: space-around; align-items: center;
+            z-index: 100;
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            flex: 1; height: 100%; cursor: pointer; color: var(--c-text-sub);
+        }
+        .nav-item.active { color: var(--c-primary); }
+        .nav-icon { width: 32px; height: 32px; margin-bottom: 4px; }
+        
+        /* Map Styles */
+        .level-node {
+            width: 70px; height: 70px; border-radius: 50%; background: var(--c-success);
+            box-shadow: 0 6px 0 var(--c-success-sh); display: grid; place-items: center;
+            font-size: 2rem; color: #fff; margin: 20px auto; cursor: pointer;
+        }
+        .level-node.locked { background: var(--c-locked); box-shadow: none; pointer-events: none; }
+        .level-node.current { animation: bounce 2s infinite; }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-10px);}
+            60% {transform: translateY(-5px);}
+        }
+        
+        /* LOGO STYLE */
+        .logo-img { width: 180px; height: auto; display: block; margin: 0 auto 10px auto; }
+
+        /* =========================================
+           6. ESTILOS DE LA LECCIÓN (NUEVO)
+           ========================================= */
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .option-btn {
+            background: var(--bg-card);
+            border: 2px solid var(--c-border); border-bottom-width: 4px;
+            border-radius: var(--radius); padding: 20px;
+            font-size: 1.1rem; text-align: center; cursor: pointer;
+            transition: 0.2s; color: var(--c-text); font-weight: 600;
+        }
+        .option-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+        .option-btn.selected { border-color: var(--c-primary); background: #ddf4ff; color: var(--c-primary); }
+        .option-btn.correct { border-color: var(--c-success); background: var(--c-success-lt); color: var(--c-success-sh); }
+        .option-btn.wrong { border-color: var(--c-error); background: var(--c-error-lt); color: var(--c-error); }
+
+        .lesson-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            padding: 20px; background: var(--bg-body);
+            border-top: 2px solid var(--c-border);
+            display: flex; flex-direction: column;
+        }
+        @media(min-width: 480px) { .lesson-footer { position: absolute; } }
+
+    </style>
+</head>
+<body>
+
+    <div id="app-root">
+        
+        <section id="view-auth" class="view full-screen active" style="justify-content:center;">
+            <div style="text-align:center; margin-bottom:30px;">
+                <img src="logoDuolingo.webp" alt="Logo Duolingo" class="logo-img">
+                <h3 style="color:var(--c-success)">Aprende Idiomas</h3>
+            </div>
+
+            <div class="auth-tabs">
+                <div class="auth-tab active" id="tab-login" onclick="App.auth.switchTab('login')">INGRESAR</div>
+                <div class="auth-tab" id="tab-register" onclick="App.auth.switchTab('register')">REGISTRAR</div>
+            </div>
+
+         <form id="auth-form" onsubmit="event.preventDefault(); App.auth.submit();">
+    <div class="input-group">
+        <input type="text" id="auth-user" class="input-field" 
+               placeholder="Usuario" required 
+               autocapitalize="none" 
+               autocomplete="off" 
+               autocorrect="off"
+               spellcheck="false">
+    </div>
+    <div class="input-group">
+        <input type="password" id="auth-pass" class="input-field" 
+               placeholder="Contraseña" required>
+    </div>
+    <button type="submit" class="btn btn-primary" id="btn-auth-action">INICIAR SESIÓN</button>
+</form>
+            <p id="auth-error" style="color:var(--c-error); text-align:center; margin-top:10px; font-weight:bold;"></p>
+        </section>
+
+
+        <section id="view-home" class="view">
+            <header style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:2px solid var(--c-border);">
+                <div>🇺🇸 Inglés</div>
+                <div style="color:var(--c-error)">❤️ 5</div>
+                <div style="color:var(--c-warning)">🔥 <span id="dash-streak">0</span></div>
+            </header>
+            
+            <div style="text-align:center; margin-top:20px;">
+                <h2 style="margin-bottom:5px;">Ruta de Aprendizaje</h2>
+                <p style="font-size:0.9rem;">Completa los niveles para avanzar</p>
+            </div>
+
+            <div id="level-map-container" style="flex:1; display:flex; flex-direction:column; align-items:center; padding-top:20px;">
+                </div>
+        </section>
+
+
+        <section id="view-lesson" class="view full-screen" style="z-index: 200; background: var(--bg-body);">
+            <header style="display:flex; align-items:center; padding: 10px 0;">
+                <button onclick="App.game.quit()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--c-text-sub);">✕</button>
+                <div class="progress-container" style="flex:1; margin: 0 15px; background: var(--c-border); height:16px; border-radius:10px; overflow:hidden;">
+                    <div id="lesson-progress" style="width: 0%; height:100%; background: var(--c-success); transition: width 0.5s;"></div>
+                </div>
+                <div style="font-weight:bold; color:var(--c-error);">❤️ ∞</div>
+            </header>
+
+            <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width: 600px; margin: 0 auto; width:100%;">
+                <h2 id="lesson-question" style="margin-bottom:30px; text-align:center;">Cargando...</h2>
+                <div id="lesson-options" class="options-grid"></div>
+            </div>
+
+            <div id="lesson-footer" class="lesson-footer">
+                <div id="feedback-msg" style="display:none; margin-bottom:10px; font-weight:bold; text-align:center;"></div>
+                <button id="btn-check" class="btn btn-success" onclick="App.game.check()">COMPROBAR</button>
+                <button id="btn-next" class="btn btn-primary" onclick="App.game.next()" style="display:none;">CONTINUAR</button>
+            </div>
+        </section>
+
+
+        <section id="view-profile" class="view">
+            <header style="display:flex; justify-content:flex-end;">
+                <button onclick="App.ui.toggleTheme()" style="background:none; border:none; font-size:1.5rem;">🌓</button>
+                <button onclick="App.auth.logout()" style="background:none; border:none; font-size:1.5rem; margin-left:15px;">🚪</button>
+            </header>
+
+            <div style="display:flex; align-items:center; gap:20px; margin-bottom:30px; border-bottom:2px solid var(--c-border); padding-bottom:20px;">
+                <div style="width:80px; height:80px; background:var(--c-purple); border-radius:50%; display:grid; place-items:center; font-size:2rem; color:white; font-weight:bold;" id="profile-avatar">U</div>
+                <div>
+                    <h2 id="profile-name" style="margin:0;">Usuario</h2>
+                    <p style="margin:5px 0;">¡Estudiante Legendario!</p>
+                </div>
+            </div>
+
+            <h3>Estadísticas</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:30px;">
+                <div style="border:2px solid var(--c-border); padding:15px; border-radius:var(--radius);">
+                    🔥 <span id="profile-streak">0</span> <br><small>Racha días</small>
+                </div>
+                <div style="border:2px solid var(--c-border); padding:15px; border-radius:var(--radius);">
+                    💎 <span id="profile-xp">0</span> <br><small>Total XP</small>
+                </div>
+            </div>
+
+            <h3>Logros (Carrusel)</h3>
+            <div class="carousel-container">
+                <div class="carousel-item">
+                    <div class="badge-icon">🔥</div> <strong>En Fuego</strong> <small>3 días racha</small>
+                </div>
+                <div class="carousel-item">
+                    <div class="badge-icon">👑</div> <strong>Sabio</strong> <small>Nivel 5</small>
+                </div>
+                <div class="carousel-item">
+                    <div class="badge-icon">⚔️</div> <strong>Guerrero</strong> <small>100 XP</small>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="view-practice" class="view">
+            <h2>Práctica y Guía</h2>
+            <h3 style="margin-top:20px;">Guía Rápida</h3>
+            <div class="accordion" onclick="this.classList.toggle('open')">
+                <button class="accordion-header"><span>📝 Verbo To Be</span> <span class="chevron">▼</span></button>
+                <div class="accordion-content"><p>I am (Yo soy)<br>You are (Tú eres)<br>He is (Él es)</p></div>
+            </div>
+            <div class="accordion" onclick="this.classList.toggle('open')">
+                <button class="accordion-header"><span>🍎 Plurales</span> <span class="chevron">▼</span></button>
+                <div class="accordion-content"><p>Agrega una 's' al final.<br>Apple -> Apples</p></div>
+            </div>
+
+            <h3 style="margin-top:30px;">Tarjetas de Memoria</h3>
+            <div class="flip-grid" id="vocab-grid"></div>
+        </section>
+
+
+        <nav class="bottom-nav" id="main-nav" style="display:none;">
+            <div class="nav-item active" onclick="App.router.go('home', this)"><span style="font-size:1.5rem;">🏠</span></div>
+            <div class="nav-item" onclick="App.router.go('practice', this)"><span style="font-size:1.5rem;">🏋️</span></div>
+            <div class="nav-item" onclick="App.router.go('profile', this)"><span style="font-size:1.5rem;">👤</span></div>
+        </nav>
+
+    </div>
+
+<script type="module">
+        // ==========================================
+        // 1. IMPORTACIONES Y CONFIGURACIÓN FIREBASE
+        // ==========================================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Configuración proporcionada por el usuario
+        const firebaseConfig = {
+            apiKey: "AIzaSyCbjOddeT9-VNSUoXuFfwjn2Mcg-PCfpU0",
+            authDomain: "duolingo-clone-js.firebaseapp.com",
+            projectId: "duolingo-clone-js",
+            storageBucket: "duolingo-clone-js.firebasestorage.app",
+            messagingSenderId: "537892154680",
+            appId: "1:537892154680:web:c7fd4e732cc2cce085e5cd"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        
+        const APP_ID = 'duolingo-clone-v1';
+        const USERS_COLLECTION_PATH = `artifacts/${APP_ID}/public/data/users`;
+
+        // ==========================================
+        // 2. CAPA DE DATOS (CLOUD DATABASE)
+        // ==========================================
+        const DB = {
+            vocab: [
+                { en: "Apple", es: "Manzana" },
+                { en: "Water", es: "Agua" },
+                { en: "Bread", es: "Pan" },
+                { en: "Woman", es: "Mujer" }
+            ],
+            
+            // --- NUEVO: BASE DE DATOS DE PREGUNTAS ---
+            lessonsData: [
+                // Nivel 0
+                [
+                    { q: "¿Cómo se dice 'Manzana'?", options: ["Apple", "Water", "Car"], correct: 0 },
+                    { q: "Traduce: 'Mujer'", options: ["Man", "Bread", "Woman"], correct: 2 },
+                    { q: "¿Qué es 'Water'?", options: ["Fuego", "Agua", "Tierra"], correct: 1 }
+                ],
+                // Nivel 1
+                [
+                    { q: "Traduce: 'Boy'", options: ["Niño", "Niña", "Hombre"], correct: 0 },
+                    { q: "¿Cómo se dice 'Pan'?", options: ["Red", "Bread", "Bed"], correct: 1 },
+                    { q: "I am a man", options: ["Soy un hombre", "Soy una mujer", "Él es un niño"], correct: 0 }
+                ],
+                // Nivel 2
+                [
+                    { q: "¿Rojo en inglés?", options: ["Blue", "Red", "Green"], correct: 1 },
+                    { q: "She is happy", options: ["Ella es feliz", "Él es feliz", "Yo soy feliz"], correct: 0 },
+                    { q: "Traduce: 'Gato'", options: ["Dog", "Cat", "Bird"], correct: 1 }
+                ],
+                // Nivel 3
+                [
+                    { q: "Goodbye", options: ["Hola", "Adiós", "Gracias"], correct: 1 },
+                    { q: "Traduce: 'Love'", options: ["Odio", "Amor", "Vida"], correct: 1 },
+                    { q: "I drink water", options: ["Yo como pan", "Yo bebo agua", "Tú bebes agua"], correct: 1 }
+                ],
+                // Nivel 4
+                [
+                    { q: "The car is blue", options: ["El coche es azul", "La casa es roja", "El perro es azul"], correct: 0 },
+                    { q: "Traduce: 'Family'", options: ["Amigo", "Familia", "Fiesta"], correct: 1 },
+                    { q: "Good morning", options: ["Buenas noches", "Buenos días", "Buenas tardes"], correct: 1 }
+                ]
+            ],
+
+            findUser: async (username) => {
+                try {
+                    const docRef = doc(db, USERS_COLLECTION_PATH, username);
+                    const docSnap = await getDoc(docRef);
+                    return docSnap.exists() ? docSnap.data() : null;
+                } catch (error) {
+                    console.error("Error buscando usuario:", error);
+                    return null;
+                }
+            },
+
+            saveUser: async (user) => {
+                try {
+                    await setDoc(doc(db, USERS_COLLECTION_PATH, user.username), user);
+                    return true;
+                } catch (error) {
+                    console.error("Error guardando usuario:", error);
+                    alert("Error guardando datos. Revisa la consola.");
+                    return false;
+                }
+            }
+        };
+
+        // ==========================================
+        // 3. CONTROLADOR APP
+        // ==========================================
+        const App = {
+            state: {
+                currentUser: null,
+                authMode: 'login'
+            },
+
+            init: async () => {
+                try {
+                    await signInAnonymously(auth);
+                    console.log("Conectado a Firebase");
+
+                    const lastUser = localStorage.getItem('duo_session');
+                    if (lastUser) {
+                        const btn = document.getElementById('btn-auth-action');
+                        if(btn) btn.textContent = "Cargando...";
+                        
+                        const user = await DB.findUser(lastUser);
+                        if (user) {
+                            App.auth.startSession(user);
+                            return;
+                        } else {
+                            localStorage.removeItem('duo_session');
+                        }
+                    }
+                    const btn = document.getElementById('btn-auth-action');
+                    if(btn) btn.textContent = "INICIAR SESIÓN";
+
+                } catch (err) {
+                    console.error("Error de inicialización:", err);
+                    document.getElementById('auth-error').textContent = "Error de conexión con la base de datos.";
+                }
+            },
+
+            // --- Autenticación ---
+            auth: {
+                switchTab: (mode) => {
+                    App.state.authMode = mode;
+                    document.getElementById('tab-login').classList.toggle('active', mode === 'login');
+                    document.getElementById('tab-register').classList.toggle('active', mode === 'register');
+                    
+                    const btn = document.getElementById('btn-auth-action');
+                    btn.textContent = mode === 'login' ? 'INICIAR SESIÓN' : 'CREAR CUENTA';
+                    btn.classList.remove('btn-success', 'btn-primary');
+                    btn.classList.add(mode === 'register' ? 'btn-success' : 'btn-primary');
+                    document.getElementById('auth-error').textContent = '';
+                },
+
+                submit: async () => {
+                    const userVal = document.getElementById('auth-user').value.trim().toLowerCase();
+                    const passVal = document.getElementById('auth-pass').value.trim();
+                    const errorMsg = document.getElementById('auth-error');
+                    const btn = document.getElementById('btn-auth-action');
+
+                    if(!userVal || !passVal) {
+                        errorMsg.textContent = "Completa todos los campos";
+                        return;
+                    }
+
+                    const originalText = btn.textContent;
+                    btn.textContent = "Procesando...";
+                    btn.disabled = true;
+
+                    try {
+                        const existingUser = await DB.findUser(userVal);
+
+                        if (App.state.authMode === 'register') {
+                            if (existingUser) throw new Error("Usuario ocupado.");
+                            const newUser = {
+                                username: userVal, password: passVal,
+                                xp: 0, streak: 1, level: 0
+                            };
+                            const success = await DB.saveUser(newUser);
+                            if(success) App.auth.startSession(newUser);
+                            else throw new Error("No se pudo crear.");
+
+                        } else {
+                            if (!existingUser) throw new Error("Usuario no existe.");
+                            if (existingUser.password !== passVal) throw new Error("Contraseña incorrecta.");
+                            App.auth.startSession(existingUser);
+                        }
+                    } catch (err) {
+                        errorMsg.textContent = err.message;
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }
+                },
+
+                startSession: (user) => {
+                    App.state.currentUser = user;
+                    localStorage.setItem('duo_session', user.username);
+                    document.getElementById('view-auth').classList.remove('active');
+                    document.getElementById('main-nav').style.display = 'flex';
+                    App.ui.updateDashboard();
+                    App.ui.updateProfile();
+                    App.ui.renderVocab();
+                    App.router.go('home');
+                },
+
+                logout: () => {
+                    localStorage.removeItem('duo_session');
+                    location.reload();
+                }
+            },
+
+            // --- Motor del Juego (NUEVO) ---
+            game: {
+                currentLevel: 0, qIndex: 0, score: 0,
+                currentQuestions: [], selectedOption: null,
+
+                start: (levelIndex) => {
+                    if (!DB.lessonsData[levelIndex]) {
+                        alert("¡Próximamente más niveles! Demo finalizada.");
+                        return;
+                    }
+                    App.game.currentLevel = levelIndex;
+                    App.game.currentQuestions = DB.lessonsData[levelIndex];
+                    App.game.qIndex = 0;
+                    App.game.selectedOption = null;
+
+                    document.getElementById('lesson-progress').style.width = '0%';
+                    App.router.go('lesson');
+                    App.game.renderQuestion();
+                },
+
+                renderQuestion: () => {
+                    const qData = App.game.currentQuestions[App.game.qIndex];
+                    document.getElementById('lesson-question').textContent = qData.q;
+                    const optionsContainer = document.getElementById('lesson-options');
+                    optionsContainer.innerHTML = '';
+
+                    const btnCheck = document.getElementById('btn-check');
+                    btnCheck.style.display = 'block';
+                    btnCheck.disabled = true;
+                    document.getElementById('btn-next').style.display = 'none';
+                    document.getElementById('feedback-msg').style.display = 'none';
+
+                    qData.options.forEach((opt, index) => {
+                        const btn = document.createElement('div');
+                        btn.className = 'option-btn';
+                        btn.textContent = opt;
+                        btn.onclick = () => App.game.selectOption(index, btn);
+                        optionsContainer.appendChild(btn);
+                    });
+                },
+
+                selectOption: (index, btnElement) => {
+                    document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+                    btnElement.classList.add('selected');
+                    App.game.selectedOption = index;
+                    document.getElementById('btn-check').disabled = false;
+                },
+
+                check: () => {
+                    const qData = App.game.currentQuestions[App.game.qIndex];
+                    const isCorrect = App.game.selectedOption === qData.correct;
+                    const optionsEls = document.querySelectorAll('.option-btn');
+                    const feedback = document.getElementById('feedback-msg');
+
+                    optionsEls[App.game.selectedOption].classList.remove('selected');
+                    if (isCorrect) {
+                        optionsEls[App.game.selectedOption].classList.add('correct');
+                        feedback.textContent = "¡Excelente! 🎉";
+                        feedback.style.color = "var(--c-success)";
+                    } else {
+                        optionsEls[App.game.selectedOption].classList.add('wrong');
+                        optionsEls[qData.correct].classList.add('correct');
+                        feedback.textContent = "Solución: " + qData.options[qData.correct];
+                        feedback.style.color = "var(--c-error)";
+                    }
+
+                    feedback.style.display = 'block';
+                    document.getElementById('btn-check').style.display = 'none';
+                    document.getElementById('btn-next').style.display = 'block';
+
+                    const percent = ((App.game.qIndex + 1) / App.game.currentQuestions.length) * 100;
+                    document.getElementById('lesson-progress').style.width = `${percent}%`;
+                },
+
+                next: async () => {
+                    App.game.qIndex++;
+                    if (App.game.qIndex < App.game.currentQuestions.length) {
+                        App.game.renderQuestion();
+                    } else {
+                        await App.game.finishLevel();
+                    }
+                },
+
+                finishLevel: async () => {
+                    const user = App.state.currentUser;
+                    alert("¡Nivel Completado! +10 XP");
+                    user.xp += 10;
+                    if (user.level === App.game.currentLevel) user.level++;
+                    
+                    await DB.saveUser(user);
+                    App.ui.updateDashboard();
+                    App.ui.updateProfile();
+                    App.router.go('home');
+                },
+
+                quit: () => {
+                    if(confirm("¿Salir de la lección? Perderás el progreso.")) App.router.go('home');
+                }
+            },
+
+            // --- Enrutador ---
+            router: {
+                go: (viewName, navEl = null) => {
+                    document.querySelectorAll('.view').forEach(v => {
+                        if (v.id !== 'view-auth') v.classList.remove('active');
+                    });
+                    
+                    const target = document.getElementById(`view-${viewName}`);
+                    if(target) target.classList.add('active');
+
+                    if (navEl) {
+                        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                        navEl.classList.add('active');
+                    } else if (viewName === 'home') {
+                         document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+                         const homeIcon = document.querySelector('.nav-item');
+                         if(homeIcon) homeIcon.classList.add('active');
+                    }
+                }
+            },
+
+            // --- UI Render ---
+            ui: {
+                toggleTheme: () => {
+                    const body = document.documentElement;
+                    body.setAttribute('data-theme', body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+                },
+
+                updateDashboard: () => {
+                    const user = App.state.currentUser;
+                    if(!user) return;
+                    document.getElementById('dash-streak').textContent = user.streak;
+                    const container = document.getElementById('level-map-container');
+                    container.innerHTML = '';
+                    
+                    // Render 5 niveles
+                    for (let i = 0; i < 5; i++) {
+                        const node = document.createElement('div');
+                        let status = 'locked';
+                        let content = '🔒';
+                        
+                        if (i < user.level) { status = 'completed'; content = '👑'; node.style.background = '#ffc800'; }
+                        else if (i === user.level) { status = 'current'; content = '★'; node.classList.add('current'); }
+
+                        node.className = `level-node ${status}`;
+                        node.innerHTML = content;
+                        
+                        // Zig-Zag effect
+                        const offset = i % 2 === 0 ? 0 : (i % 4 === 1 ? -30 : 30);
+                        node.style.transform = `translateX(${offset}px)`;
+                        
+                        node.onclick = () => {
+                            if (status === 'locked') alert("¡Bloqueado! Completa el nivel anterior.");
+                            else App.game.start(i); // Iniciar Juego
+                        };
+                        container.appendChild(node);
+                    }
+                },
+
+                updateProfile: () => {
+                    const user = App.state.currentUser;
+                    if(!user) return;
+                    document.getElementById('profile-name').textContent = user.username.toUpperCase();
+                    document.getElementById('profile-avatar').textContent = user.username.charAt(0).toUpperCase();
+                    document.getElementById('profile-streak').textContent = user.streak;
+                    document.getElementById('profile-xp').textContent = user.xp;
+                },
+
+                renderVocab: () => {
+                    const grid = document.getElementById('vocab-grid');
+                    if(!grid) return;
+                    grid.innerHTML = '';
+                    DB.vocab.forEach(word => {
+                        const card = document.createElement('div');
+                        card.className = 'flip-card';
+                        card.innerHTML = `
+                            <div class="flip-inner">
+                                <div class="flip-front">${word.en}</div>
+                                <div class="flip-back">${word.es}</div>
+                            </div>
+                        `;
+                        card.onclick = function() { this.classList.toggle('flipped'); }
+                        grid.appendChild(card);
+                    });
+                }
+            }
+        };
+
+        window.App = App;
+        window.onload = App.init;
+    </script>
+</body>
+</html>
