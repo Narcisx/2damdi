@@ -6,7 +6,7 @@
     <title>Duolingo</title>
     <link rel="icon" type="image/webp" href="duolingoIcon.webp">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css"/>
     <style>
         /* =========================================
            1. SISTEMA DE DISEÑO (DARK MODE VISUAL + VARIABLES ORIGINALES)
@@ -502,6 +502,66 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.2);
             border: 1px solid #ddd;
         }
+
+        /* =========================================
+           15. ARREGLO DE BANDERAS (FLAG FIX)
+           ========================================= */
+        /* Forzamos que la clase .fi (bandera) sea un círculo perfecto y ocultamos textos raros */
+        .fi {
+            width: 24px !important;       /* Tamaño fijo */
+            height: 24px !important;      /* Tamaño fijo */
+            line-height: 24px !important; /* Alineación vertical */
+            border-radius: 50%;           /* Redonda */
+            background-size: cover !important;
+            background-position: center !important;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.2); /* Borde sutil */
+            display: inline-block !important;
+            vertical-align: middle;
+            
+            /* Esto oculta las letras "fi fr" si aparecen */
+            color: transparent !important; 
+            overflow: hidden !important;
+            font-size: 0 !important;      /* Hace el texto invisible */
+        }
+
+        /* Ajuste específico para el icono grande del Home */
+        #flag-icon.fi {
+            width: 32px !important;
+            height: 32px !important;
+            box-shadow: none;
+        }
+
+        /* Ajuste para el icono grande del Perfil */
+        #profile-flag-display.fi, #profile-flag-card.fi {
+            width: 40px !important;
+            height: 40px !important;
+            display: block !important; /* Para que se centre bien en las stats */
+            margin: 0 auto;
+        }
+        /* =========================================
+           17. TRANSICIÓN DE ENTRADA AL NIVEL
+           ========================================= */
+        /* Aseguramos que el círculo tenga transición */
+        .node-circle {
+            transition: transform 0.2s ease, background-color 0.3s;
+        }
+
+        /* Cuando activamos la clase 'opening' en el nodo padre */
+        .map-node.opening {
+            z-index: 9999 !important; /* Poner por encima de todo */
+        }
+
+        .map-node.opening .node-circle {
+            /* Transformación mágica */
+            position: fixed;
+            top: 50%; 
+            left: 50%;
+            /* Se mueve al centro y crece GIGANTE */
+            transform: translate(-50%, -50%) scale(50); 
+            z-index: 9999;
+            transition: transform 0.5s ease-in; /* Duración de la expansión */
+            box-shadow: none; /* Quitamos sombra para que se vea plano al llenar */
+        }
     </style>
 </head>
 <body>
@@ -592,7 +652,7 @@
         <section id="view-home" class="view">
             <header class="top-bar">
                 <div class="stat-item" onclick="App.ui.toggleLang(true)">
-                    <span id="flag-icon" style="font-size:1.5rem;">🇺🇸</span>
+                    <span id="flag-icon"></span>
                 </div>
                 <div class="stat-item stat-fire">
                     <span style="font-size:1.2rem;">🔥</span> <span id="dash-streak">0</span>
@@ -675,7 +735,7 @@
 
                 <div class="profile-stats-row">
                     <div class="p-stat-box">
-                        <span id="profile-flag-display" style="font-size: 1.5rem;">🇺🇸</span>
+                        <span id="profile-flag-display"></span>
                         <span class="p-stat-label">Cursos</span>
                     </div>
                     <div class="p-stat-box" style="cursor:pointer;" onclick="App.ui.openFriendsList('following')">
@@ -761,12 +821,14 @@
         </section>
 
         <section id="view-lesson" class="view full-screen" style="z-index:300;">
-            <header style="display:flex; align-items:center; margin-bottom:20px;">
+          <header style="display:flex; align-items:center; margin-bottom:20px;">
                 <button onclick="App.game.quit()" style="background:none; border:none; font-size:1.5rem; color:var(--c-text-sub); cursor:pointer;">✕</button>
+                
                 <div style="flex:1; margin:0 15px; background:var(--c-border); height:16px; border-radius:10px; overflow:hidden;">
                     <div id="lesson-progress" style="width:0%; height:100%; background:var(--c-success); transition:width 0.5s;"></div>
                 </div>
-                <div style="font-weight:bold; color:var(--c-error);">❤️ ∞</div>
+                
+                <div id="lives-display" style="font-weight:bold; color:var(--c-error);">❤️ 5</div>
             </header>
 
             <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width:600px; margin:0 auto; width:100%;">
@@ -847,7 +909,7 @@
         const DB = {
             courses: {
            en: {
-                    id: 'en', name: 'Inglés', flag: '🇺🇸',
+                    id: 'en', name: 'Inglés', flag: 'fi fi-us',
                     vocab: [
                         { t: "Apple", n: "Manzana" }, { t: "Water", n: "Agua" },
                         { t: "Bread", n: "Pan" }, { t: "Milk", n: "Leche" },
@@ -888,7 +950,7 @@
                     ]
                 },
                fr: {
-                    id: 'fr', name: 'Francés', flag: '🇫🇷',
+                    id: 'fr', name: 'Francés', flag: 'fi fi-fr',
                     vocab: [
                         { t: "Eau", n: "Agua" }, { t: "Pomme", n: "Manzana" },
                         { t: "Pain", n: "Pan" }, { t: "Lait", n: "Leche" },
@@ -924,7 +986,7 @@
                     ]
                 },
             de: {
-                    id: 'de', name: 'Alemán', flag: '🇩🇪',
+                    id: 'de', name: 'Alemán', flag: 'fi fi-de',
                     vocab: [
                         { t: "Wasser", n: "Agua" }, { t: "Brot", n: "Pan" },
                         { t: "Milch", n: "Leche" }, { t: "Apfel", n: "Manzana" },
@@ -1135,14 +1197,16 @@
                     App.game.levelId = levelIndex;
                     App.game.data = course.lessons[levelIndex];
                     App.game.qIndex = 0;
-                    App.game.lessonLives = 2; // Reiniciar las 2 oportunidades
-                    
-                    // Actualizar UI del Header de Lección
-                    const heartUI = document.querySelector('#view-lesson header div:last-child');
+                  App.game.lessonLives = 2; // Reiniciar las 2 oportunidades
+                
+                // ACTUALIZACIÓN SEGURA POR ID
+                const heartUI = document.getElementById('lives-display');
+                if(heartUI) {
                     heartUI.innerHTML = `❤️ ${App.game.lessonLives}`;
                     heartUI.style.color = "var(--c-error)";
+                }
 
-                    document.getElementById('lesson-progress').style.width = '0%';
+                document.getElementById('lesson-progress').style.width = '0%';
                     App.router.go('lesson');
                     App.game.renderQ();
                 },
@@ -1203,11 +1267,12 @@
                         App.game.lessonLives--;
                         
                         // Actualizar UI visualmente
-                        const heartUI = document.querySelector('#view-lesson header div:last-child');
-                        heartUI.innerHTML = `❤️ ${App.game.lessonLives}`;
-                        heartUI.style.animation = "shake 0.5s"; // Efecto visual
-                        setTimeout(()=> heartUI.style.animation = "", 500);
-
+                        const heartUI = document.getElementById('lives-display');
+                        if(heartUI) {
+                            heartUI.innerHTML = `❤️ ${App.game.lessonLives}`;
+                            heartUI.style.animation = "shake 0.5s";
+                            setTimeout(()=> heartUI.style.animation = "", 500);
+                        }
                         if (App.game.lessonLives > 0) {
                             // Aún le queda 1 oportunidad en el nivel
                             feed.textContent = `¡Incorrecto! Te queda ${App.game.lessonLives} vida.`;
@@ -1576,19 +1641,21 @@
                     }, 600); // Este tiempo debe coincidir con el del CSS (0.6s)
                 },
                 toggleLang: (s) => document.getElementById('lang-modal').style.display = s ? 'flex' : 'none',
-                renderLangList: () => {
+             renderLangList: () => {
                     const c = document.getElementById('lang-list');
                     c.innerHTML = '';
                     Object.values(DB.courses).forEach(crs => {
                         const b = document.createElement('div');
                         b.className = 'btn btn-outline';
-                        b.innerHTML = `${crs.flag} ${crs.name}`;
+                        // AHORA USAMOS UN SPAN CON LA CLASE
+                        b.innerHTML = `<span class="${crs.flag}" style="margin-right:8px;"></span> ${crs.name}`;
                         b.style.marginBottom = '10px';
                         b.onclick = () => { 
                             App.state.currentLang = crs.id; 
                             App.ui.toggleLang(false);
                             App.ui.updateDashboard();
                             App.ui.renderVocab();
+                            App.ui.updateProfile(); // Importante actualizar perfil también
                         };
                         c.appendChild(b);
                       });
@@ -1596,9 +1663,12 @@
                 updateDashboard: () => {
                      const user = App.calculateHearts(App.state.currentUser);
                     
-                    const curLang = App.state.currentLang;
+                 const curLang = App.state.currentLang;
                     const course = DB.courses[curLang];
-                    
+                    const flagIcon = document.getElementById('flag-icon');
+                    flagIcon.textContent = ''; 
+                    flagIcon.className = course.flag; // Asigna 'fi fi-us', etc.
+
                     document.getElementById('flag-icon').textContent = course.flag;
                     document.getElementById('dash-streak').textContent = user.streak;
                     document.getElementById('dash-xp').textContent = user.xp;
@@ -1665,17 +1735,38 @@
                                     App.ui.updateProfile();
                                 }
                             };
-                        } else {
+                       } else {
+                            // Nivel o Trofeo
                             el.className = `map-node ${isLocked ? 'locked' : ''} ${isCurrent ? 'current' : ''}`;
                             el.innerHTML = `
                                 ${isCurrent ? '<div style="position:absolute; top:-30px; font-size:1.5rem; animation:bounce 2s infinite;">👑</div>' : ''}
                                 <div class="node-circle">
-                                    <svg class="star-icon" viewBox="0 0 24 24" width="30" height="30"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                                    <svg class="star-icon" viewBox="0 0 24 24" width="30" height="30">
+                                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                    </svg>
                                     ${isDone ? '<div style="position:absolute; bottom:-12px; display:flex; gap:2px; font-size:10px;">⭐⭐⭐</div>' : ''}
-                                </div>`;
+                                </div>
+                            `;
+                            
+                            // --- LÓGICA DE CLICK CON TRANSICIÓN ---
                             el.onclick = () => {
-                                if(isLocked) alert("Nivel Bloqueado");
-                                else App.game.start(userLevel);
+                                if(isLocked) {
+                                    alert("Nivel Bloqueado");
+                                } else {
+                                    // 1. Añadir clase para iniciar animación
+                                    el.classList.add('opening');
+                                    
+                                    // 2. Esperar 500ms (lo que dura la transición CSS)
+                                    setTimeout(() => {
+                                        // 3. Iniciar el juego
+                                        App.game.start(userLevel);
+                                        
+                                        // 4. Limpiar la clase después (para cuando vuelvas al mapa)
+                                        setTimeout(() => {
+                                            el.classList.remove('opening');
+                                        }, 100); 
+                                    }, 500);
+                                }
                             };
                         }
                         map.appendChild(el);
@@ -1776,6 +1867,7 @@
                     document.getElementById('avatar-modal').style.display = 'none';
                 },
 updateProfile: () => {
+
                     const u = App.state.currentUser;
                     const curLang = App.state.currentLang;
                     const course = DB.courses[curLang];
@@ -1840,7 +1932,22 @@ updateProfile: () => {
                             if(ring) ring.style.background = `conic-gradient(var(--c-success) ${percent}%, transparent 0)`;
                         }
                     }
+                    // Dentro de updateProfile:
+
+// CAMBIO EN LA BANDERA GRANDE (Stats Row)
+const flagDisplay = document.getElementById('profile-flag-display');
+flagDisplay.textContent = '';        // 1. IMPORTANTE: Esto borra cualquier texto (como "fi fi-us")
+flagDisplay.className = course.flag; // 2. IMPORTANTE: Esto asigna la CLASE para que salga el dibujo
+
+// CAMBIO EN LA TARJETA DE RESUMEN
+const flagCard = document.getElementById('profile-flag-card');
+flagCard.textContent = ''; 
+flagCard.className = course.flag;
                 },
+
+
+
+
                 // --- NUEVO: CARGAR CLASIFICACIÓN ---
              // --- CORRECCIÓN: CARGAR CLASIFICACIÓN CON AVATARES ---
               // --- CARGAR CLASIFICACIÓN CON SEPARADOR ---
