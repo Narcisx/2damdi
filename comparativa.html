@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Benchmark LLMs: Dashboard Final</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0a0a;
+            --glass-bg: rgba(30, 30, 30, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --accent-qwen: #36A2EB;
+            --accent-llama: #FF6384;
+            --accent-gemma: #4BC0C0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at top right, rgba(54, 162, 235, 0.1), transparent 40%),
+                radial-gradient(circle at bottom left, rgba(255, 99, 132, 0.1), transparent 40%),
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 100%, 100%, 20px 20px, 20px 20px;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 30px 20px;
+            overflow-x: hidden;
+        }
+
+        h1 {
+            font-weight: 600;
+            font-size: 2.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #fff 30%, var(--accent-qwen));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .subtitle { text-align: center; color: #aaa; margin-bottom: 30px; font-weight: 300; }
+
+        .container {
+            width: 95%;
+            max-width: 900px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 40px 30px 30px 30px; 
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            position: relative; 
+        }
+        
+        /* Aseguramos que los controles estén por encima de todo */
+        .controls {
+            position: relative;
+            z-index: 30; 
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+
+        select {
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background-color: rgba(30, 30, 30, 0.9); /* Fondo más sólido para legibilidad */
+            color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        select:hover {
+            background-color: rgba(50, 50, 50, 1);
+            border-color: var(--accent-qwen);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 450px;
+            width: 100%;
+            border-radius: 16px;
+            background: rgba(0,0,0,0.2); 
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        /* --- BADGE DE GANADOR --- */
+        #winnerBadge {
+            position: absolute;
+            top: 30px;   
+            right: 30px; 
+            background: rgba(20, 20, 20, 0.8); 
+            border: 1px solid rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px);
+            padding: 8px 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateX(20px); 
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
+            pointer-events: none; /* Importante: Para que no bloquee clics si se superpone */
+        }
+
+        #winnerBadge.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .trophy-icon { font-size: 1.2rem; }
+
+        .winner-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            line-height: 1.1;
+        }
+
+        .winner-label { font-size: 0.7rem; color: #aaa; text-transform: uppercase; letter-spacing: 1px; }
+        .winner-name { font-size: 1rem; font-weight: 800; }
+        
+        @media (max-width: 600px) {
+            .controls { justify-content: center; margin-top: 50px; }
+            #winnerBadge { top: 20px; left: 50%; right: auto; transform: translateX(-50%); width: fit-content; }
+            #winnerBadge.visible { transform: translateX(-50%); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        .stat-card:hover { transform: translateY(-5px); }
+        .stat-card.qwen { border-bottom: 3px solid var(--accent-qwen); }
+        .stat-card.llama { border-bottom: 3px solid var(--accent-llama); }
+        .stat-card.gemma { border-bottom: 3px solid var(--accent-gemma); }
+        .stat-card small { color: #aaa; display: block; margin-bottom: 8px; }
+        .stat-card strong { font-size: 1.5rem; font-weight: 600; }
+
+    </style>
+</head>
+<body>
+
+    <h1>Comparativa IA</h1>
+    <p class="subtitle">Datos de rendimiento local</p>
+
+    <div class="container">
+        <div id="winnerBadge">
+            <div class="trophy-icon">🏆</div>
+            <div class="winner-info">
+                <span class="winner-label">Ganador</span>
+                <span class="winner-name" id="badgeName">Modelo</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <select id="dataMetric" onchange="initChart()">
+                <option value="speed">⚡ Velocidad (Tokens/s)</option>
+                <option value="length">📝 Tokens Totales</option>
+                <option value="prompt">🧠 Velocidad Lectura</option>
+                <option value="load">⏱️ Tiempo Carga</option>
+            </select>
+
+            <select id="chartType" onchange="initChart()">
+                <option value="bar">📊 Barras</option>
+                <option value="line">📈 Líneas</option>
+                <option value="radar">🕸️ Radar</option>
+                <option value="doughnut">🍩 Donut</option>
+            </select>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="myChart"></canvas>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card qwen">
+                <small>Qwen</small>
+                <strong style="color: var(--accent-qwen)">20.48 t/s</strong>
+            </div>
+            <div class="stat-card llama">
+                <small>Llama</small>
+                <strong style="color: var(--accent-llama)">18.73 t/s</strong>
+            </div>
+            <div class="stat-card gemma">
+                <small>Gemma</small>
+                <strong style="color: var(--accent-gemma)">910 tokens</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const models = ['Qwen', 'Llama', 'Gemma'];
+        const colors = {
+            qwen: { main: '#36A2EB', fade: 'rgba(54, 162, 235, 0.1)' },
+            llama: { main: '#FF6384', fade: 'rgba(255, 99, 132, 0.1)' },
+            gemma: { main: '#4BC0C0', fade: 'rgba(75, 192, 192, 0.1)' }
+        };
+
+        const dataSets = {
+            speed: { label: 'Velocidad de Generación (Tokens/s)', data: [20.48, 18.73, 18.57] },
+            length: { label: 'Cantidad de Tokens Generados', data: [671, 737, 910] },
+            prompt: { label: 'Velocidad de Prompt (Tokens/s)', data: [171.38, 163.77, 4653.98] },
+            load: { label: 'Tiempo de Carga (ms)', data: [356.30, 367.04, 371.80] }
+        };
+
+        let currentChart = null;
+        let isFirstLoad = true; 
+
+        function updateWinnerBadge() {
+            const metric = document.getElementById('dataMetric').value;
+            const currentData = dataSets[metric].data;
+
+            // Lógica de Ganador
+            let extremeValue;
+            if (metric === 'load') {
+                extremeValue = Math.min(...currentData);
+            } else {
+                extremeValue = Math.max(...currentData);
+            }
+            const winnerIndex = currentData.indexOf(extremeValue);
+            const winnerName = models[winnerIndex];
+            const winnerColor = colors[winnerName.toLowerCase()].main;
+
+            const badge = document.getElementById('winnerBadge');
+            const nameSpan = document.getElementById('badgeName');
+
+            // Actualizamos visualmente
+            nameSpan.textContent = winnerName;
+            nameSpan.style.color = winnerColor;
+            badge.style.borderColor = winnerColor;
+            badge.style.boxShadow = `0 4px 15px ${winnerColor}30`; 
+            
+            badge.classList.add('visible');
+
+            // Confeti solo si NO es la primera carga (para no saturar al entrar)
+            if (!isFirstLoad) {
+                confetti({
+                    particleCount: 40,
+                    spread: 50,
+                    origin: { y: 0.3, x: 0.9 }, 
+                    colors: [winnerColor, '#ffffff'],
+                    disableForReducedMotion: true,
+                    scalar: 0.8
+                });
+            }
+        }
+
+        function initChart() {
+            const ctx = document.getElementById('myChart').getContext('2d');
+            const metric = document.getElementById('dataMetric').value;
+            const type = document.getElementById('chartType').value;
+            const currentData = dataSets[metric];
+
+            // Creamos los degradados frescos cada vez para evitar errores de contexto
+            let gradientQwen = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientQwen.addColorStop(0, colors.qwen.main); gradientQwen.addColorStop(1, colors.qwen.fade);
+            let gradientLlama = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientLlama.addColorStop(0, colors.llama.main); gradientLlama.addColorStop(1, colors.llama.fade);
+            let gradientGemma = ctx.createLinearGradient(0, 0, 0, 400);
+            gradientGemma.addColorStop(0, colors.gemma.main); gradientGemma.addColorStop(1, colors.gemma.fade);
+
+            const config = {
+                type: type,
+                data: {
+                    labels: models,
+                    datasets: [{
+                        label: currentData.label,
+                        data: currentData.data,
+                        backgroundColor: [gradientQwen, gradientLlama, gradientGemma],
+                        borderColor: [colors.qwen.main, colors.llama.main, colors.gemma.main],
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: type === 'line' ? 'start' : true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { 
+                        duration: 800, 
+                        easing: 'easeOutQuart',
+                        onComplete: () => {
+                            // Ejecutamos la lógica de ganador al terminar la animación
+                            updateWinnerBadge();
+                            if(isFirstLoad) isFirstLoad = false;
+                        }
+                    },
+                    plugins: {
+                        legend: { display: type === 'doughnut' || type === 'radar', labels: { color: '#ddd' } },
+                        tooltip: { backgroundColor: 'rgba(0,0,0,0.8)', padding: 10 }
+                    },
+                    scales: (type === 'radar' || type === 'doughnut') ? {
+                        r: { grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#ddd' }, ticks: { display: false } }
+                    } : {
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#aaa' } },
+                        x: { grid: { display: false }, ticks: { color: '#eee' } }
+                    }
+                }
+            };
+
+            // Destruimos el gráfico anterior si existe para limpiar memoria y estado
+            if (currentChart) { 
+                currentChart.destroy(); 
+                // Ocultamos el badge momentáneamente para dar sensación de refresco
+                document.getElementById('winnerBadge').classList.remove('visible');
+            }
+            
+            currentChart = new Chart(ctx, config);
+        }
+
+        // Arrancar
+        initChart();
+
+    </script>
+</body>
+</html>
