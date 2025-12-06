@@ -3,12 +3,87 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2025-12-05T13:38:39+01:00</updated>
+    <updated>2025-12-06T20:34:15+01:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
     <id>https://narcisx.github.io/2damdi</id>
 
+    <entry>
+        <title>Configuración inicial de la jetson nano</title>
+        <author>
+            <name>Germán Narciso Córdoba</name>
+        </author>
+        <link href="https://narcisx.github.io/2damdi/configuracion-inicial-de-la-jetson-nano.html"/>
+        <id>https://narcisx.github.io/2damdi/configuracion-inicial-de-la-jetson-nano.html</id>
+
+        <updated>2025-12-06T20:34:15+01:00</updated>
+            <summary>
+                <![CDATA[
+                    En este post se encuentra la documentación donde configuraremos la jetson nano&hellip;
+                ]]>
+            </summary>
+        <content type="html">
+            <![CDATA[
+                <p>En este post se encuentra la documentación donde configuraremos la jetson nano desde 0.</p>
+<p>1.Montamos la jetson nano</p>
+<p>Abrimos el paquete e instalamos la jetson nano junto con a ssd</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/1.1.jpg" alt="" width="1600" height="1200" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/1.1-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1.1-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1.1-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1.1-lg.jpg 1024w"></figure>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/1.2.jpg" alt="" width="1600" height="1200" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/1.2-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1.2-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1.2-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1.2-lg.jpg 1024w"></figure>
+<p>Conectamos teclado y ratón y la salida de video.</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/1.3.jpg" alt="" width="1200" height="1600" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/1.3-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1.3-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1.3-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1.3-lg.jpg 1024w"></figure>
+<p>Conectamos la ssd</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/1.jpg" alt="" width="1600" height="720" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/1-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/1-lg.jpg 1024w"></figure>
+<p>2.Encendemos la Jetson nano</p>
+<p>Aparecera esto por primera vez</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/2.jpg" alt="" width="1599" height="899" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/2-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/2-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/2-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/2-lg.jpg 1024w"></figure>
+<p>3.Hacemos la tipica instalación de ubuntu</p>
+<p> </p>
+<figure class="post__image"><img  src="https://narcisx.github.io/2damdi/media/posts/8/3.1-2.jpg" alt="" width="340" height="191" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/3.1-2-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.1-2-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.1-2-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.1-2-lg.jpg 1024w"></figure><figure class="post__image"><img loading="lazy"  style="color: var(--text-primary-color); font-family: var(--editor-font-family); font-size: inherit; font-weight: var(--font-weight-normal); outline: 3px solid rgba(var(--color-primary-rgb), 0.55) !important;" src="https://narcisx.github.io/2damdi/media/posts/8/3.2-2.jpg" alt="" width="341" height="192" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/3.2-2-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.2-2-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.2-2-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.2-2-lg.jpg 1024w"></figure>
+<p>Configuramos el usuario<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/3.7.jpg" alt="" width="1599" height="899" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/3.7-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.7-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.7-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.7-lg.jpg 1024w"></figure>
+<p>Instalamos el Chromium</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/3.9-2.jpg" alt="" width="1599" height="899" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/3.9-2-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.9-2-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.9-2-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.9-2-lg.jpg 1024w"></figure>
+<p>Dejamos que configure el sistema</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/3.19.jpg" alt="" width="1600" height="900" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/3.19-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.19-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.19-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/3.19-lg.jpg 1024w"></figure>
+<p>4. Actualizamos y configuramos teclado y ratón</p>
+<p>Ahora que ya estamos en el escritorio, hay que actualizar todo.</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/4.jpg" alt="" width="1600" height="1200" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/4-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4-lg.jpg 1024w"></figure>
+<p>Nos vamos a updates y actualizamos</p>
+<figure class="post__image"><img  src="https://narcisx.github.io/2damdi/media/posts/8/4.1.jpg" alt="" width="334" height="188" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/4.1-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4.1-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4.1-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4.1-lg.jpg 1024w"></figure><figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/4.2.jpg" alt="" width="333" height="187" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/4.2-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4.2-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4.2-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4.2-lg.jpg 1024w"></figure>
+<p>Conectamos el teclado y el ratón en bluetooth</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/4.3.jpg" alt="" width="421" height="316" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/4.3-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4.3-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4.3-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/4.3-lg.jpg 1024w"></figure>
+<p>5.Configuración para montar la ssd</p>
+<p>Hacemos un lspci  para mostrar información detallada sobre todos los dispositivos PCI</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/5.jpg" alt="" width="523" height="697" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/5-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5-lg.jpg 1024w"></figure>
+<p> </p>
+<p>Y ahora un lsblk para preparar  el ssd y hacerle un automount</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/5.1.jpg" alt="" width="447" height="596" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/5.1-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.1-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.1-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.1-lg.jpg 1024w"></figure>
+<p>Formateamos y etiquetamos</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/5.3.jpg" alt="" width="1200" height="1600" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/5.3-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.3-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.3-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.3-lg.jpg 1024w"></figure>
+<p>Montamos en la carpeta ssd y que cada vez que se encienda el ordenador se monte automaticamente</p>
+<p> </p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/5.5.jpg" alt="" width="1200" height="1600" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/5.5-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.5-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.5-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.5-lg.jpg 1024w"></figure>
+<p>Sacamos el UUID</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/5.6.jpg" alt="" width="1200" height="1600" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/5.6-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.6-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.6-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.6-lg.jpg 1024w"></figure>
+<p>Al disco con formato ext 4 le ponemos la configuracion default 0 2 y que se monte al ssd con ese UUID</p>
+<p> </p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/5.7.jpg" alt="" width="1200" height="1600" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/5.7-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.7-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.7-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.7-lg.jpg 1024w"></figure>
+<p>Ponemos esa carpeta ssd a nuestro usuario para poder utilizarlo</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/5.8.jpg" alt="" width="1200" height="1600" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/5.8-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.8-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.8-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.8-lg.jpg 1024w"></figure>
+<p>Instalamos la libreria FUSE</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/5.10-2.jpg" alt="" width="1200" height="1600" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/5.10-2-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.10-2-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.10-2-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/5.10-2-lg.jpg 1024w"></figure>
+<p>6. Instalacion para los modelos de IA</p>
+<p>Instalaremos el Ollama para poder utilizar los modelos de la ia y en la siguiente actividad hacer una comparativa.</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/6.jpg" alt="" width="1920" height="1080" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/6-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/6-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/6-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/6-lg.jpg 1024w"></figure>
+<p>Y asi se instala un modelo de ia.</p>
+<figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/8/6.2.jpg" alt="" width="1599" height="899" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/8/responsive/6.2-xs.jpg 300w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/6.2-sm.jpg 480w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/6.2-md.jpg 768w ,https://narcisx.github.io/2damdi/media/posts/8/responsive/6.2-lg.jpg 1024w"></figure>
+<p> </p>
+<p>En la siguiente actividad realizaremos mas descargas de los modelos y los compararemos entre si, con una aplicacion web con las comparaciones.</p>
+<p> </p>
+<p> </p>
+            ]]>
+        </content>
+    </entry>
     <entry>
         <title>Clon App</title>
         <author>
