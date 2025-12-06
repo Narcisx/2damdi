@@ -3,7 +3,7 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2025-12-06T22:35:05+01:00</updated>
+    <updated>2025-12-06T22:39:44+01:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
@@ -16,15 +16,18 @@
         </author>
         <link href="https://narcisx.github.io/2damdi/comparativa-de-modelos-jetson-nano.html"/>
         <id>https://narcisx.github.io/2damdi/comparativa-de-modelos-jetson-nano.html</id>
+        <media:content url="https://narcisx.github.io/2damdi/media/posts/9/portada.png" medium="image" />
 
         <updated>2025-12-06T21:12:52+01:00</updated>
             <summary>
                 <![CDATA[
+                        <img src="https://narcisx.github.io/2damdi/media/posts/9/portada.png" alt="" />
                     Aqui podemos encontrar la comparativa que hacemos de diferentes modelos de IA,&hellip;
                 ]]>
             </summary>
         <content type="html">
             <![CDATA[
+                    <p><img src="https://narcisx.github.io/2damdi/media/posts/9/portada.png" class="type:primaryImage" alt="" /></p>
                 <p>Aqui podemos encontrar la comparativa que hacemos de diferentes modelos de IA, tanto como sus tokens, contexto, etc.. usando la Jetson Nano y el Mac Mini (En el Mac mini subiré más tarde las comparativas ya que no nos dió tiempo y las que probamos se quedaban pillados)</p>
 <div class="post__toc">
 <h3>Comparativa IAs</h3>
@@ -103,7 +106,7 @@
 </tr>
 </tbody>
 </table>
-<p>Click aqui para ver la comparativa en una web</p>
+<p><a href="https://narcisx.github.io/2damdi/comparativa.html">Click aqui para ver la comparativa en una web</a></p>
 <p> </p>
             ]]>
         </content>
