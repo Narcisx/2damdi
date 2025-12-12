@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ViewerMAx - Visor Universal</title>
+    
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+ <style>
+        /* --- VARIABLES & TEMAS (MODO OSCURO POR DEFECTO) --- */
+        :root {
+            /* Colores Base */
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.5);
+            --primary-dark: #6d28d9;
+            --secondary: #06b6d4;
+            
+            /* Estado */
+            --status-text: #4ade80; 
+            --folder-color: #fbbf24;
+            --aura-color: #4ade80;
+
+            /* Fondos Oscuros */
+            --bg-deep: #020617;
+            --bg-panel: rgba(15, 23, 42, 0.6);
+            --bg-header: rgba(15, 23, 42, 0.8);
+            --bg-viewer: radial-gradient(circle at center, #1e1e2f 0%, #000 100%);
+            --bg-code: #0d1117;
+            --bg-terminal: #020408;
+            --bg-meta-item: rgba(255, 255, 255, 0.05); /* Fondo para items de info */
+
+            /* Textos y Bordes */
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --text-header-gradient: linear-gradient(to right, #fff, #94a3b8);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.08);
+            
+            /* UI */
+            --radius-lg: 16px;
+            --radius-sm: 8px;
+            --shadow-soft: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* --- MODO CLARO (ALTO CONTRASTE MEJORADO) --- */
+        body.light-mode {
+            /* Fondos Claros */
+            --bg-deep: #ffffff;
+            --bg-panel: #f8fafc;
+            --bg-header: #ffffff;
+            --bg-viewer: #f1f5f9;
+            --bg-code: #ffffff;
+            --bg-terminal: #1e293b;
+            --bg-meta-item: #e2e8f0;
+
+            /* Textos Oscuros */
+            --text-main: #0f172a;
+            --text-muted: #334155;
+            --text-header-gradient: linear-gradient(to right, #0f172a, #475569);
+            
+            /* Bordes y UI */
+            --glass-border: 1px solid #cbd5e1;
+            --shadow-soft: 0 4px 10px rgba(0,0,0,0.05);
+            --primary-glow: rgba(139, 92, 246, 0.1);
+
+            /* Colores de estado más fuertes */
+            --status-text: #166534;
+            --folder-color: #ea580c;
+        }
+
+        /* --- RESET GLOBAL --- */
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        header {
+            background: var(--bg-header);
+            backdrop-filter: blur(12px);
+            padding: 0 2rem;
+            border-bottom: var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+            z-index: 50;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .header-branding { display: flex; align-items: center; gap: 15px; }
+        
+        .header-text-container h1 {
+            font-size: 1.4rem; font-weight: 800; letter-spacing: -0.5px;
+            background: var(--text-header-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+        .header-text-container p { font-size: 0.8rem; color: var(--secondary); margin: 0; font-weight: 500; }
+
+        /* Status Bar con Aura */
+        #status-bar {
+            font-size: 0.85rem; font-weight: 600; 
+            color: var(--status-text);
+            background: rgba(125, 125, 125, 0.1);
+            border: 1px solid var(--status-text);
+            padding: 6px 12px; border-radius: 20px;
+            transition: all 0.5s ease;
+        }
+        #status-bar.aura-active {
+            background-color: var(--aura-color) !important;
+            border-color: var(--aura-color) !important;
+            color: #000 !important;
+            font-weight: 800;
+            animation: pulseAura 1.5s infinite ease-in-out;
+        }
+        @keyframes pulseAura {
+            0%   { box-shadow: 0 0 0 0px var(--aura-color); }
+            70%  { box-shadow: 0 0 0 15px rgba(0,0,0,0); }
+            100% { box-shadow: 0 0 0 0px rgba(0,0,0,0); }
+        }
+
+        /* Botón Tema */
+        .theme-btn {
+            background: transparent;
+            border: var(--glass-border);
+            color: var(--text-main);
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .theme-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--primary);
+        }
+        .theme-btn svg { position: absolute; transition: all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .icon-moon { opacity: 1; transform: rotate(0deg) scale(1); color: #a78bfa; }
+        .icon-sun { opacity: 0; transform: rotate(90deg) scale(0.5); color: #f59e0b; }
+        body.light-mode .icon-moon { opacity: 0; transform: rotate(-90deg) scale(0.5); }
+        body.light-mode .icon-sun { opacity: 1; transform: rotate(0deg) scale(1); }
+
+        main { flex: 1; display: flex; overflow: hidden; }
+
+        .sidebar {
+            width: 320px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(10px);
+            border-right: var(--glass-border);
+            display: flex; flex-direction: column; padding: 1.5rem;
+            overflow-y: auto;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .drop-zone {
+            border: 2px dashed var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem 1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative; overflow: hidden;
+            color: var(--text-main);
+        }
+        .drop-zone:hover {
+            border-color: var(--primary);
+            background: rgba(139, 92, 246, 0.05);
+        }
+        .drop-icon { 
+            width: 50px; height: 50px; margin-bottom: 1rem; 
+            color: var(--text-muted); transition: 0.3s; 
+        }
+        .drop-zone:hover .drop-icon { color: var(--primary); transform: scale(1.1); }
+
+        .metadata-panel { margin-top: 2rem; animation: fadeIn 0.5s ease; }
+        .meta-item { 
+            background: var(--bg-meta-item);
+            padding: 10px; border-radius: 8px; margin-bottom: 8px; 
+            border: var(--glass-border);
+            color: var(--text-main);
+        }
+        .meta-label { font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); display: block; margin-bottom: 4px; }
+        #meta-name { word-break: break-all; font-weight: bold; }
+
+        /* Viewer - MODIFICADO PARA CENTRADO */
+        .viewer-area {
+            flex: 1; background: rgba(0,0,0,0.02);
+            position: relative; display: flex; flex-direction: column; overflow: hidden;
+        }
+        
+        .viewer-content {
+            flex: 1; 
+            overflow: hidden; 
+            position: relative;
+            
+            /* AQUÍ ESTÁ LA MAGIA DEL CENTRADO: */
+            display: flex;             /* Usar Flexbox */
+            justify-content: center;   /* Centrar horizontalmente */
+            align-items: center;       /* Centrar verticalmente */
+            flex-direction: column;    /* Apilar contenido verticalmente */
+
+            width: 100%; height: 100%;
+            background: var(--bg-viewer);
+            transition: background 0.3s ease;
+            padding: 20px; /* Un poco de padding para que no toque bordes */
+        }
+
+        /* Para IFRAMES (PDF/Web) forzamos que ocupen todo */
+        .pdf-frame { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+            display: block; 
+            flex: 1; 
+        }
+
+        /* Code View - AHORA COMO "TARJETA" */
+        .code-view {
+            font-family: 'Fira Code', monospace;
+            background: var(--bg-code);
+            color: var(--text-main);
+            padding: 2rem; 
+            border-radius: var(--radius-lg);
+            border: var(--glass-border); 
+            box-shadow: var(--shadow-soft);
+            
+            /* Dimensiones inteligentes */
+            width: 90%; 
+            max-width: 1000px; /* No hacerse gigante en pantallas 4k */
+            max-height: 90vh; /* Máximo 90% de la altura de la pantalla */
+            overflow: auto;   /* Scroll interno si el texto es muy largo */
+            
+            margin: auto; /* Ayuda extra para centrado */
+            position: relative;
+        }
+
+        /* Estilos para tablas CSV */
+        .csv-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        .csv-table th, .csv-table td {
+            padding: 8px;
+            border-bottom: 1px solid var(--glass-border);
+            text-align: left;
+        }
+        .csv-table th {
+            color: var(--primary);
+            font-weight: bold;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Botones */
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white; border: none; padding: 12px;
+            border-radius: var(--radius-sm); cursor: pointer; width: 100%; margin-top: 1rem;
+            font-weight: 600; text-transform: uppercase; font-size: 0.8rem;
+            transition: all 0.2s ease;
+        }
+        .btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+
+        .close-btn {
+            position: absolute; top: 20px; right: 25px;
+            width: 40px; height: 40px; border-radius: 50%;
+            border: var(--glass-border); background: rgba(125,125,125,0.2);
+            backdrop-filter: blur(4px); color: var(--text-main);
+            font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            z-index: 100;
+        }
+        .close-btn:hover { background-color: #ef4444; color: white; border-color: #ef4444; }
+
+        .run-btn {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white; border: none; padding: 10px 20px; border-radius: 30px;
+            font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            position: absolute; bottom: 30px; right: 40px; z-index: 50;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+        .run-btn:hover { transform: scale(1.1); }
+
+        /* Custom Player */
+        .custom-player-wrapper {
+            position: relative; width: 100%; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            background: #000;
+        }
+        .media-element-custom { max-width: 100%; max-height: 100%; z-index: 10; }
+        #audio-visualizer { position: absolute; bottom: 0; left: 0; width: 100%; height: 300px; pointer-events: none; z-index: 20; opacity: 0.8; mix-blend-mode: screen; }
+        
+        .player-controls-overlay {
+            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
+            width: 80%; background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1);
+            padding: 15px 25px; border-radius: 20px; display: flex; align-items: center; gap: 20px;
+            z-index: 30; opacity: 0; transition: opacity 0.3s;
+        }
+        .custom-player-wrapper:hover .player-controls-overlay { opacity: 1; }
+        .play-pause-btn { background: var(--primary); border: none; width: 45px; height: 45px; border-radius: 50%; color: white; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
+        .progress-container { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .time-display { font-size: 0.75rem; color: #cbd5e1; display: flex; justify-content: space-between; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #fff; cursor: pointer; margin-top: -6px; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: rgba(255,255,255,0.2); border-radius: 2px; }
+
+        /* Tree View */
+        .tree-view { 
+            width: 90%; 
+            text-align: left; 
+            font-size: 0.95rem; 
+            color: var(--text-muted); 
+            background: var(--bg-code); 
+            padding: 1.5rem;
+            border-radius: var(--radius-sm);
+            margin: auto; 
+            max-height: 90vh; 
+            overflow: auto;
+            border: var(--glass-border);
+        }
+        .tree-ul { list-style: none; padding-left: 24px; position: relative; border-left: 1px solid var(--text-muted); opacity: 1; }
+        .tree-view > .tree-ul { border-left: none; padding-left: 0; }
+        .tree-item { padding: 6px 10px; margin: 2px 0; cursor: pointer; display: flex; align-items: center; border-radius: 4px; transition: all 0.2s; color: var(--text-main); position: relative; }
+        .tree-ul .tree-item::before { content: ''; position: absolute; left: -24px; top: 50%; width: 20px; height: 1px; background: var(--text-muted); opacity: 0.6; }
+        .tree-item:hover { background: rgba(139, 92, 246, 0.1); transform: translateX(5px); }
+        .folder { color: var(--folder-color); font-weight: 700; margin-right: 8px; z-index: 2; }
+        .file { color: var(--text-main); font-weight: 500; z-index: 2; }
+
+        .execution-panel { 
+            /* Panel de consola flotante */
+            position: absolute;
+            bottom: 80px;
+            width: 85%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            
+            border: 1px solid #334155; border-radius: var(--radius-sm); overflow: hidden; 
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+        .exec-header { background: #0f172a; padding: 8px 15px; font-size: 0.8rem; color: var(--secondary); display: flex; justify-content: space-between; }
+        .terminal-output { background: var(--bg-terminal); color: #4ade80; font-family: 'Fira Code', monospace; padding: 1rem; min-height: 120px; max-height: 300px; overflow-y: auto; }
+
+        .hidden { display: none !important; }
+        .collapsed { display: none; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 900px) {
+            body { overflow-y: auto; height: auto; min-height: 100vh; }
+            header { height: auto; flex-direction: column; padding: 1rem; gap: 10px; }
+            main { flex-direction: column; overflow: visible; height: auto; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: var(--glass-border); padding: 1rem; }
+            .drop-zone { padding: 1rem; display: flex; flex-direction: row; gap: 15px; align-items: center; justify-content: center; }
+            .viewer-area { width: 100%; min-height: 60vh; height: 600px; border-top: 1px solid rgba(125,125,125,0.1); }
+            .player-controls-overlay { opacity: 1 !important; bottom: 10px; width: 95%; }
+        }
+    </style>
+</head>
+<body>
+
+  <header>
+    <button id="theme-toggle" class="theme-btn" aria-label="Cambiar tema">
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+    </button>
+
+    <div class="header-branding">
+        <div class="header-text-container">
+            <h1>ViewerMAx</h1>
+            <p>Visor Universal de Archivos</p>
+        </div>
+    </div>
+    <div id="status-bar">Listo</div>
+</header>
+
+<main>
+    <aside class="sidebar">
+        <div class="drop-zone" id="drop-zone">
+            <input type="file" id="file-input" style="display:none">
+            <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p><strong>Arrastra aquí</strong><br>o haz clic para abrir</p>
+        </div>
+
+        <div class="metadata-panel hidden" id="meta-panel">
+            <h3>Información</h3>
+            <div class="meta-item"><span class="meta-label">Nombre</span><strong id="meta-name">-</strong></div>
+            <div class="meta-item"><span class="meta-label">Tipo</span><span id="meta-type" style="color:var(--primary)">-</span></div>
+            <div class="meta-item"><span class="meta-label">Tamaño</span><span id="meta-size">-</span></div>
+            <button class="btn" id="copy-btn" style="display:none;">Copiar Contenido</button>
+        </div>
+    </aside>
+
+    <section class="viewer-area" id="main-viewer-section">
+        <button id="close-btn" class="close-btn hidden" title="Cerrar archivo">×</button>
+        <button id="run-btn" class="run-btn hidden">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+            EJECUTAR
+        </button>
+        <div id="viewer-content" class="viewer-content">
+            <div class="empty-state">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <p>Esperando archivo...</p>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const viewer = document.getElementById('viewer-content');
+        const metaName = document.getElementById('meta-name');
+        const metaType = document.getElementById('meta-type');
+        const metaSize = document.getElementById('meta-size');
+        const copyBtn = document.getElementById('copy-btn');
+        const statusBar = document.getElementById('status-bar');
+        const closeBtn = document.getElementById('close-btn');
+        const runBtn = document.getElementById('run-btn');
+
+        let currentCode = ""; 
+        let currentExt = "";
+        let pyodide = null; 
+        let pyodideReady = false;
+        let audioContext = null;
+        let animationFrameId = null;
+
+        const ZIP_VARIANTS = ['zip', 'docx', 'xlsx', 'pptx', 'odt', 'ods', 'jar', 'apk', 'epub'];
+        const CODE_EXTS = ['txt', 'js', 'html', 'css', 'json', 'py', 'java', 'c', 'cpp', 'php', 'sql', 'xml', 'svg', 'ini', 'md'];
+        const RUNNABLE_EXTS = ['js', 'py', 'java']; 
+
+        async function loadPythonEngine() {
+            try {
+                statusBar.textContent = "Cargando motor Python...";
+                pyodide = await loadPyodide();
+                pyodideReady = true;
+                statusBar.textContent = "Listo (Python activado)";
+                console.log("Python cargado correctamente");
+            } catch (err) {
+                console.error("Error cargando Pyodide:", err);
+                statusBar.textContent = "Error cargando Python";
+            }
+        }
+        loadPythonEngine();
+
+        dropZone.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => handleFile(e.target.files[0]);
+        
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-active'); });
+        dropZone.addEventListener('dragleave', (e) => { e.preventDefault(); dropZone.classList.remove('drag-active'); });
+        dropZone.addEventListener('drop', (e) => { 
+            e.preventDefault(); 
+            dropZone.classList.remove('drag-active');
+            handleFile(e.dataTransfer.files[0]); 
+        });
+
+        function getStatusColor(ext, mime) {
+            if (CODE_EXTS.includes(ext) || mime.startsWith('text/') || mime.includes('json')) return '#22d3ee'; 
+            if (mime.startsWith('image/') || mime.startsWith('video/') || mime.startsWith('audio/')) return '#d946ef';
+            if (ZIP_VARIANTS.includes(ext) || mime.includes('pdf')) return '#facc15';
+            return '#4ade80'; 
+        }
+
+        function handleFile(file) {
+            if (!file) return;
+            
+            const ext = file.name.split('.').pop().toLowerCase();
+            const mime = file.type || 'application/octet-stream';
+            
+            currentExt = ext; 
+
+            const auraColor = getStatusColor(ext, mime);
+            statusBar.style.setProperty('--aura-color', auraColor);
+            statusBar.classList.add('aura-active');
+            statusBar.textContent = `Analizando ${ext.toUpperCase()}...`;
+
+            resetViewer(); 
+            closeBtn.classList.remove('hidden');
+
+            metaName.textContent = file.name;
+            metaSize.textContent = formatBytes(file.size);
+            metaType.textContent = mime || `.${ext}`;
+
+            document.getElementById('meta-panel').classList.remove('hidden');
+            viewer.innerHTML = '<p style="color:var(--primary);">Cargando contenido...</p>';
+
+            const reader = new FileReader();
+
+            if (ZIP_VARIANTS.includes(ext) || mime.includes('zip')) {
+                reader.onload = (e) => renderZip(e.target.result);
+                reader.readAsArrayBuffer(file);
+                return;
+            }
+
+            if (mime.startsWith('image/')) {
+                reader.onload = (e) => {
+                    viewer.innerHTML = `
+                        <div class="custom-player-wrapper">
+                            <img src="${e.target.result}" class="media-element-custom" style="object-fit:contain; max-height:90vh;" title="${file.name}">
+                        </div>`;
+                    statusBar.textContent = "Visualizando Imagen";
+                };
+                reader.readAsDataURL(file);
+                return;
+            }
+
+            if (mime.startsWith('video/') || mime.startsWith('audio/') || ['mp3', 'wav', 'ogg', 'm4a', 'flac', 'mp4', 'webm', 'mkv', 'mov'].includes(ext)) {
+                const url = URL.createObjectURL(file);
+                const isVideo = mime.startsWith('video') || ['mp4', 'webm', 'mkv', 'mov'].includes(ext);
+                renderCustomPlayer(url, isVideo ? 'video' : 'audio');
+                statusBar.textContent = isVideo ? "Reproductor de Video Activado" : "Reproductor de Música Activado";
+                return;
+            }
+
+            if (ext === 'html' || ext === 'htm') {
+                const url = URL.createObjectURL(file);
+                viewer.innerHTML = `<iframe src="${url}" class="pdf-frame" style="background:#fff; width:100%; height:100%; border:none;"></iframe>`;
+                statusBar.textContent = "Visualizando Web";
+                return;
+            }
+
+            if (mime === 'application/pdf') {
+                const url = URL.createObjectURL(file);
+                viewer.innerHTML = `<iframe src="${url}" class="pdf-frame"></iframe>`;
+                statusBar.textContent = "Visualizando PDF";
+                return;
+            }
+
+            // LÓGICA DE TEXTO / CÓDIGO
+            if (CODE_EXTS.includes(ext) || mime.startsWith('text/') || mime.includes('json') || mime.includes('xml') || ext === 'csv') {
+                reader.onload = (e) => {
+                    currentCode = e.target.result;
+                    let displayContent = currentCode;
+                    
+                    if (ext === 'md') {
+                        viewer.innerHTML = `<div class="code-view">${parseMarkdown(displayContent)}</div>`;
+                    } else if (ext === 'csv') {
+                        renderCSV(displayContent);
+                    } else {
+                        if (ext === 'json') { try { displayContent = JSON.stringify(JSON.parse(displayContent), null, 4); } catch(e){} }
+                        viewer.innerHTML = `<div class="code-view">${escapeHtml(displayContent)}</div>`;
+                    }
+
+                    if (RUNNABLE_EXTS.includes(ext)) {
+                        runBtn.classList.remove('hidden');
+                        if(ext === 'java') statusBar.textContent = "Código Java (Simulación Web)";
+                        else statusBar.textContent = "Script Detectado";
+                    } else {
+                        statusBar.textContent = "Visualizando Código";
+                    }
+                    
+                    setupCopy(displayContent);
+                };
+                reader.readAsText(file);
+                return;
+            }
+
+            renderHexFallback(file);
+        }
+
+        // --- RENDERIZADO CSV MEJORADO ---
+        function renderCSV(text) {
+            const rows = text.split('\n').slice(0, 100);
+            let html = '<table class="csv-table">';
+            rows.forEach((row, i) => {
+                if (!row.trim()) return;
+                html += '<tr>' + row.split(',').map(c => i===0?`<th>${c}</th>`:`<td>${c}</td>`).join('') + '</tr>';
+            });
+            // Envolver en .code-view para que comparta el estilo centrado
+            viewer.innerHTML = `<div class="code-view">${html}</table></div>`;
+        }
+
+        function renderCustomPlayer(url, type) {
+            const playerHTML = `
+                <div class="custom-player-wrapper">
+                    ${type === 'video' 
+                        ? `<video id="media-source" src="${url}" class="media-element-custom"></video>` 
+                        : `<audio id="media-source" src="${url}"></audio><div style="font-size:5rem;">🎵</div>`}
+                    
+                    <canvas id="audio-visualizer"></canvas>
+
+                    <div class="player-controls-overlay">
+                        <button id="cp-play-btn" class="play-pause-btn">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                        </button>
+                        <div class="progress-container">
+                            <div class="time-display">
+                                <span id="cp-current-time">0:00</span>
+                                <span id="cp-duration">0:00</span>
+                            </div>
+                            <input type="range" id="cp-seek-bar" value="0" min="0" step="0.1">
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            viewer.innerHTML = playerHTML;
+
+            const media = document.getElementById('media-source');
+            const playBtn = document.getElementById('cp-play-btn');
+            const seekBar = document.getElementById('cp-seek-bar');
+            const currentTimeEl = document.getElementById('cp-current-time');
+            const durationEl = document.getElementById('cp-duration');
+            const canvas = document.getElementById('audio-visualizer');
+
+            playBtn.onclick = () => {
+                if (media.paused) {
+                    media.play();
+                    initAudioContext(media, canvas);
+                    playBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>';
+                } else {
+                    media.pause();
+                    playBtn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>';
+                }
+            };
+
+            media.ontimeupdate = () => {
+                seekBar.value = media.currentTime;
+                currentTimeEl.textContent = formatTime(media.currentTime);
+            };
+
+            seekBar.oninput = () => { media.currentTime = seekBar.value; };
+
+            media.onloadedmetadata = () => {
+                seekBar.max = media.duration;
+                durationEl.textContent = formatTime(media.duration);
+            };
+        }
+
+        function initAudioContext(mediaElement, canvas) {
+            if (audioContext) return; 
+
+            const ctx = canvas.getContext('2d');
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const analyser = audioContext.createAnalyser();
+            const source = audioContext.createMediaElementSource(mediaElement);
+            
+            source.connect(analyser);
+            analyser.connect(audioContext.destination);
+
+            analyser.fftSize = 256;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function resizeCanvas() {
+                canvas.width = canvas.offsetWidth;
+                canvas.height = canvas.offsetHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            function draw() {
+                animationFrameId = requestAnimationFrame(draw);
+                analyser.getByteFrequencyData(dataArray);
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const barWidth = (canvas.width / bufferLength) * 2.5;
+                let barHeight;
+                let x = 0;
+
+                for(let i = 0; i < bufferLength; i++) {
+                    barHeight = dataArray[i];
+                    const gradient = ctx.createLinearGradient(0, canvas.height, 0, 0);
+                    gradient.addColorStop(0, '#8b5cf6');
+                    gradient.addColorStop(1, '#06b6d4');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                    x += barWidth + 1;
+                }
+            }
+            draw();
+        }
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${minutes}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        runBtn.onclick = async () => {
+            let consolePanel = document.getElementById('exec-panel');
+            if (!consolePanel) {
+                const panelHtml = `
+                    <div id="exec-panel" class="execution-panel" style="display:block">
+                        <div class="exec-header">
+                            <span>TERMINAL (${currentExt.toUpperCase()})</span>
+                            <span style="cursor:pointer" onclick="document.getElementById('exec-output').innerHTML=''">Limpiar</span>
+                        </div>
+                        <div id="exec-output" class="terminal-output"></div>
+                    </div>`;
+                viewer.querySelector('.code-view').insertAdjacentHTML('afterend', panelHtml);
+            } else {
+                consolePanel.style.display = 'block';
+                document.getElementById('exec-output').innerHTML = '';
+            }
+
+            const outputDiv = document.getElementById('exec-output');
+            const log = (msg, color='#0f0') => {
+                outputDiv.innerHTML += `<span style="color:${color}">${msg}</span><br>`;
+                outputDiv.scrollTop = outputDiv.scrollHeight;
+            };
+
+            log(`> Iniciando ejecución de ${currentExt}...`, '#fff');
+
+            if (currentExt === 'js') {
+                try {
+                    const originalLog = console.log;
+                    console.log = (...args) => { originalLog(...args); log(args.join(' ')); };
+                    eval(currentCode); 
+                } catch (e) { log(`Error JS: ${e.message}`, '#f00'); }
+            }
+            else if (currentExt === 'py') {
+                if (!pyodideReady) { log("⚠️ Python aún cargando... espera.", "orange"); return; }
+                try {
+                    pyodide.setStdout({ batched: (msg) => log(msg) });
+                    await pyodide.runPythonAsync(currentCode);
+                } catch (e) { log(`${e}`, '#f00'); }
+            }
+            else if (currentExt === 'java') {
+                log("Nota: Ejecutando en modo 'Simulación Web'. No soporta librerías externas.", "gray");
+                try {
+                    const mainMatch = currentCode.match(/public\s+static\s+void\s+main\s*\(\s*String\s*\[\]\s*\w+\s*\)\s*\{([\s\S]*?)\}/);
+                    if (!mainMatch) throw new Error("No se encontró el método 'public static void main'.");
+                    let mainBody = mainMatch[1];
+                    let jsTranspiled = mainBody
+                        .replace(/System\.out\.println\s*\((.*?)\);/g, "console.log($1);")
+                        .replace(/System\.out\.print\s*\((.*?)\);/g, "console.log($1);")
+                        .replace(/int\s/g, "let ")
+                        .replace(/String\s/g, "let ")
+                        .replace(/double\s/g, "let ")
+                        .replace(/boolean\s/g, "let ");
+                    const originalLog = console.log;
+                    console.log = (...args) => { originalLog(...args); log(args.join(' ')); };
+                    eval(jsTranspiled);
+                    log("\n[Proceso finalizado con éxito]", "#4ade80");
+                } catch (e) { log(`Error de Compilación/Ejecución: ${e.message}`, '#f00'); }
+            }
+        };
+
+        function resetViewer() {
+            runBtn.classList.add('hidden');
+            if (audioContext) { audioContext.close(); audioContext = null; }
+            if (animationFrameId) { cancelAnimationFrame(animationFrameId); }
+            const existingPanel = document.getElementById('exec-panel');
+            if(existingPanel) existingPanel.remove();
+            copyBtn.style.display = 'none';
+        }
+
+        function renderHexFallback(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => renderHexDump(e.target.result);
+            reader.readAsArrayBuffer(file.slice(0, 16384));
+        }
+
+        async function renderZip(buffer) {
+            try {
+                const zip = new JSZip();
+                const content = await zip.loadAsync(buffer);
+                const files = Object.keys(content.files);
+                if (files.length === 0) throw new Error("El archivo está vacío.");
+
+                const tree = {};
+                files.forEach(path => {
+                    const parts = path.split('/');
+                    let current = tree;
+                    parts.forEach((part, i) => {
+                        if (!part) return;
+                        if (!current[part]) {
+                            current[part] = { 
+                                __type: (i === parts.length - 1 && !path.endsWith('/')) ? 'file' : 'folder', 
+                                __children: {} 
+                            };
+                        }
+                        current = current[part].__children;
+                    });
+                });
+
+                function buildTreeHtml(node) {
+                    let html = '';
+                    const keys = Object.keys(node).sort((a, b) => {
+                        if (node[a].__type === node[b].__type) return a.localeCompare(b);
+                        return node[a].__type === 'folder' ? -1 : 1;
+                    });
+                    keys.forEach(key => {
+                        const item = node[key];
+                        if (item.__type === 'folder') {
+                            html += `
+                                <li>
+                                    <div class="tree-item folder" onclick="this.nextElementSibling.classList.toggle('collapsed')">
+                                        ${key}
+                                    </div>
+                                    <ul class="tree-ul collapsed">${buildTreeHtml(item.__children)}</ul>
+                                </li>`;
+                        } else {
+                            html += `<li><div class="tree-item file">${key}</div></li>`;
+                        }
+                    });
+                    return html;
+                }
+                const treeHtml = buildTreeHtml(tree);
+                viewer.innerHTML = `
+                    <div class="tree-view">
+                        <h3 style="margin-bottom:1rem; color:var(--primary); border-bottom:1px solid var(--border); padding-bottom:10px;">
+                            Contenido del Archivo (${files.length} elementos)
+                        </h3>
+                        <ul class="tree-ul" style="padding-left:0; border:none;">${treeHtml}</ul>
+                    </div>`;
+                statusBar.textContent = "Estructura de Árbol Generada";
+            } catch (err) {
+                console.error(err);
+                viewer.innerHTML = `<p style="color:orange">⚠️ No se pudo generar el árbol (Formato desconocido o encriptado).</p>`;
+                renderHexFallback(new Blob([buffer]));
+            }
+        }
+
+        function renderHexDump(buffer) {
+            const view = new DataView(buffer);
+            let html = '<div class="code-view" style="display:flex; gap:20px; font-size:0.85rem;"><div class="hex-offset">';
+            let hexCol = '<div class="hex-bytes">';
+            let asciiCol = '<div class="hex-ascii">';
+            for (let i = 0; i < view.byteLength; i += 16) {
+                html += i.toString(16).padStart(8, '0').toUpperCase() + '<br>';
+                for (let j = 0; j < 16; j++) {
+                    if (i + j < view.byteLength) {
+                        const byte = view.getUint8(i + j);
+                        hexCol += byte.toString(16).padStart(2, '0').toUpperCase() + ' ';
+                        asciiCol += (byte > 31 && byte < 127) ? String.fromCharCode(byte) : '.';
+                    } else { hexCol += '   '; }
+                }
+                hexCol += '<br>'; asciiCol += '<br>';
+            }
+            viewer.innerHTML = html + '</div>' + hexCol + '</div>' + asciiCol + '</div></div>';
+        }
+
+        function parseMarkdown(md) {
+            return escapeHtml(md).replace(/^# (.*$)/gim, '<h1>$1</h1>').replace(/\*\*(.*)\*\*/gim, '<b>$1</b>').replace(/\n/gim, '<br>');
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 B';
+            const i = Math.floor(Math.log(bytes) / Math.log(1024));
+            return parseFloat((bytes / Math.pow(1024, i)).toFixed(2)) + ' ' + ['B','KB','MB','GB'][i];
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        function setupCopy(text) {
+            copyBtn.style.display = 'block';
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(text);
+                const original = copyBtn.textContent;
+                copyBtn.textContent = '¡Copiado!';
+                setTimeout(() => copyBtn.textContent = original, 2000);
+            };
+        }
+
+        closeBtn.onclick = () => {
+            viewer.innerHTML = `
+                <div class="empty-state">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <p>Esperando archivo...</p>
+                </div>
+            `;
+            document.getElementById('meta-panel').classList.add('hidden');
+            closeBtn.classList.add('hidden');
+            runBtn.classList.add('hidden');
+            copyBtn.style.display = 'none';
+            statusBar.textContent = "Listo";
+            metaName.textContent = "-";
+            metaSize.textContent = "-";
+            metaType.textContent = "-";
+            fileInput.value = '';
+            statusBar.classList.remove('aura-active');
+            statusBar.style.setProperty('--aura-color', '#4ade80'); 
+            if (audioContext) { audioContext.close(); audioContext = null; }
+            if (animationFrameId) { cancelAnimationFrame(animationFrameId); }
+        };
+
+        const themeBtn = document.getElementById('theme-toggle');
+        const body = document.body;
+        if(localStorage.getItem('theme') === 'light') {
+            body.classList.add('light-mode');
+        }
+        themeBtn.onclick = () => {
+            body.classList.toggle('light-mode');
+            const isLight = body.classList.contains('light-mode');
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        };
+    });
+</script>
+</body>
+</html>
