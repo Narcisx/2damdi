@@ -1,0 +1,265 @@
+:root {
+    --border-width: 4px;
+    --accent-color: #ff0055; /* Rosa Neón */
+    --secondary-color: #00f2ff; /* Cian Neón */
+    --bg-color: #0d0d15; /* Fondo casi negro */
+    --panel-color: #1a1a2e;
+    --text-color: #ffffff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Courier New', Courier, monospace;
+    /* Color de fondo base muy oscuro */
+    background-color: var(--bg-color);
+    color: var(--text-color);
+
+    /* --- INICIO DEL FONDO DE CIRCUITO --- */
+    /* Usamos múltiples gradientes lineales superpuestos para crear la rejilla */
+    background-image:
+        /* Líneas verticales finas (cian muy transparente) */
+        linear-gradient(to right, rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+        /* Líneas horizontales finas (cian muy transparente) */
+        linear-gradient(to bottom, rgba(0, 242, 255, 0.05) 1px, transparent 1px),
+        /* Puntos brillantes en las intersecciones (un toque de rosa) */
+        radial-gradient(circle at center, rgba(255, 0, 85, 0.15) 1px, transparent 2px);
+    
+    /* Tamaño de las celdas de la cuadrícula */
+    background-size: 40px 40px, 40px 40px, 80px 80px;
+    /* --- FIN DEL FONDO DE CIRCUITO --- */
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    /* Importante para la animación del fondo */
+    position: relative; 
+    overflow-x: hidden;
+}
+
+/* --- ANIMACIÓN DE LÍNEA DE ESCANEO --- */
+/* Usamos un pseudo-elemento para crear una barra de luz que se mueve */
+body::after {
+    content: "";
+    position: fixed; /* Fijo para cubrir toda la pantalla */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Un degradado suave que simula una luz pasando */
+    background: linear-gradient(
+        to bottom,
+        transparent,
+        rgba(0, 242, 255, 0.08) 50%, /* Luz cian tenue en el centro */
+        transparent
+    );
+    /* La animación definida más abajo */
+    animation: scanlineMove 8s linear infinite;
+    pointer-events: none; /* Permite que los clicks pasen a través del fondo */
+    z-index: -1; /* Se coloca detrás del contenido principal */
+}
+
+/* Definición de la animación: mueve la barra de arriba a abajo */
+@keyframes scanlineMove {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(100%); }
+}
+
+/* Contenedor Principal */
+#game-container {
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    filter: drop-shadow(0 0 20px rgba(255, 0, 85, 0.2));
+}
+
+/* Título con Efecto Neón */
+header h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    color: #fff;
+    text-shadow: 
+        0 0 5px #fff,
+        0 0 10px #fff,
+        0 0 20px var(--accent-color),
+        0 0 40px var(--accent-color),
+        0 0 80px var(--accent-color);
+    margin-bottom: 10px;
+}
+
+/* Panel de Cómic Mejorado */
+.comic-panel {
+    background: #000;
+    border: var(--border-width) solid #fff;
+    box-shadow: 15px 15px 0px var(--accent-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.image-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background-color: #050505;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain; /* Para que la imagen se vea completa */
+    border-bottom: var(--border-width) solid #fff;
+    transition: background-image 0.5s ease-in-out;
+}
+
+/* Bocadillo de Narración */
+.narrative-box {
+    padding: 25px;
+    background: #fff;
+    color: #000;
+    font-size: 1.2rem;
+    font-weight: bold;
+    min-height: 110px;
+    position: relative;
+    border-top: var(--border-width) solid #000;
+}
+
+.narrative-box::before {
+    content: "LOG_SYSTEM >";
+    position: absolute;
+    top: -12px;
+    left: 15px;
+    background: var(--accent-color);
+    color: white;
+    padding: 2px 12px;
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+}
+
+/* Botones Cyberpunk */
+.choices-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+button {
+    padding: 18px;
+    font-size: 1rem;
+    font-family: inherit;
+    font-weight: 900;
+    text-transform: uppercase;
+    cursor: pointer;
+    background: transparent;
+    color: var(--secondary-color);
+    border: 2px solid var(--secondary-color);
+    position: relative;
+    /* Corte de esquinas estilo Sci-Fi */
+    clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+button:hover {
+    background: var(--secondary-color);
+    color: #000;
+    box-shadow: 0 0 20px var(--secondary-color);
+    transform: scale(1.02);
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* Animación de entrada de botones */
+.btn-appear {
+    animation: slideIn 0.4s ease forwards;
+}
+/* --- TÍTULO CON EFECTO GLITCH (MEJORADO) --- */
+.glitch-title {
+    text-align: center;
+    font-size: 3.5rem; /* Un poco más grande para impactar */
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    color: #fff;
+    position: relative;
+    margin-bottom: 20px;
+    
+    /* Sombra base para legibilidad */
+    text-shadow: 
+        0 0 5px rgba(255, 255, 255, 0.5),
+        0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Creamos dos copias del texto usando pseudo-elementos */
+.glitch-title::before,
+.glitch-title::after {
+    content: attr(data-text); /* Toma el texto del HTML dinámicamente */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color); /* Del mismo color del fondo para ocultar partes */
+}
+
+/* Capa 1: El efecto Cian (desplazado a la izquierda) */
+.glitch-title::before {
+    left: 2px;
+    text-shadow: -2px 0 var(--secondary-color); /* Cian Neón */
+    clip-path: inset(24% 0 29% 0); /* Recorte inicial */
+    animation: glitch-anim-1 2.5s infinite linear alternate-reverse;
+}
+
+/* Capa 2: El efecto Rosa (desplazado a la derecha) */
+.glitch-title::after {
+    left: -2px;
+    text-shadow: -2px 0 var(--accent-color); /* Rosa Neón */
+    clip-path: inset(54% 0 21% 0); /* Recorte inicial */
+    animation: glitch-anim-2 3s infinite linear alternate-reverse;
+}
+
+/* --- KEYFRAMES PARA LA ANIMACIÓN GLITCH --- */
+/* Estas animaciones mueven el área visible (clip-path) rápidamente */
+
+@keyframes glitch-anim-1 {
+    0% { clip-path: inset(40% 0 61% 0); }
+    20% { clip-path: inset(92% 0 1% 0); }
+    40% { clip-path: inset(43% 0 1% 0); }
+    60% { clip-path: inset(25% 0 58% 0); }
+    80% { clip-path: inset(54% 0 7% 0); }
+    100% { clip-path: inset(58% 0 43% 0); }
+}
+
+@keyframes glitch-anim-2 {
+    0% { clip-path: inset(24% 0 29% 0); }
+    20% { clip-path: inset(54% 0 21% 0); }
+    40% { clip-path: inset(5% 0 85% 0); }
+    60% { clip-path: inset(1% 0 68% 0); }
+    80% { clip-path: inset(75% 0 2% 0); }
+    100% { clip-path: inset(35% 0 9% 0); }
+}
+
+/* Ajuste responsive para móviles */
+@media (max-width: 600px) {
+    .glitch-title {
+        font-size: 2rem;
+        letter-spacing: 4px;
+    }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateX(-20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 600px) {
+    .choices-container { grid-template-columns: 1fr; }
+    header h1 { font-size: 1.5rem; }
+}
