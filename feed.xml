@@ -3,7 +3,7 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2026-01-09T13:38:17+01:00</updated>
+    <updated>2026-01-09T13:44:36+01:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
@@ -16,15 +16,18 @@
         </author>
         <link href="https://narcisx.github.io/2damdi/novela-grafica.html"/>
         <id>https://narcisx.github.io/2damdi/novela-grafica.html</id>
+        <media:content url="https://narcisx.github.io/2damdi/media/posts/11/image4-2.png" medium="image" />
 
         <updated>2026-01-09T13:30:56+01:00</updated>
             <summary>
                 <![CDATA[
+                        <img src="https://narcisx.github.io/2damdi/media/posts/11/image4-2.png" alt="" />
                     En este post encontraras los prompts de como crear una novela gráfica&hellip;
                 ]]>
             </summary>
         <content type="html">
             <![CDATA[
+                    <p><img src="https://narcisx.github.io/2damdi/media/posts/11/image4-2.png" class="type:primaryImage" alt="" /></p>
                 <p>En este post encontraras los prompts de como crear una novela gráfica paso a paso:<br><br></p>
 <h4><strong>Prompts</strong></h4>
 <p><strong><br></strong>1.<span style="font-weight: 400;">Crear una novela gráfica interactiva con imágenes y texto. Los usuarios pueden decidir por donde transcurre parte de la trama y así habrá diferentes finales. Debe de tener el estilo de comic.<br></span></p>
