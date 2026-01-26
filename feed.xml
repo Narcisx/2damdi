@@ -3,7 +3,7 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2026-01-27T00:50:01+01:00</updated>
+    <updated>2026-01-27T00:54:20+01:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
@@ -32,14 +32,10 @@
 <h3 data-path-to-node="3"></h3>
 <h3 data-path-to-node="3"></h3>
 <h1 data-path-to-node="3"><strong data-path-to-node="3" data-index-in-node="0">1. </strong><strong data-path-to-node="3" data-index-in-node="0">Prompts</strong></h1>
-<blockquote data-path-to-node="4">
 <p data-path-to-node="4,0"><strong data-path-to-node="4,0" data-index-in-node="0">Prompt:</strong> <i data-path-to-node="4,0" data-index-in-node="8">"Diseñar una arquitectura escalable para la orquestación de máquinas virtuales locales y ejecución remota de comandos mediante SSH secure channel."</i></p>
-</blockquote>
 <p data-path-to-node="5">Empecé el proyecto definiendo la arquitectura. Decidí que usaría <strong data-path-to-node="5" data-index-in-node="65">Python (Flask)</strong> para el backend y que gestionaría las máquinas virtuales de forma local, asegurándome de que el sistema fuera escalable desde el principio.<br><br></p>
 <p data-path-to-node="6"><strong data-path-to-node="6" data-index-in-node="0">2. Creando el control remoto</strong></p>
-<blockquote data-path-to-node="7">
-<p data-path-to-node="7,0"><strong data-path-to-node="7,0" data-index-in-node="0">Prompt:</strong> <i data-path-to-node="7,0" data-index-in-node="8">"Desarrollar una API RESTful en Python que exponga endpoints para la gestión del ciclo de vida de VMs (start/stop/status) y monitorización de recursos (CPU/RAM) vía SSH."</i></p>
-</blockquote>
+<p data-path-to-node="6"><strong style="font-family: var(--editor-font-family); font-size: inherit;" data-path-to-node="7,0" data-index-in-node="0">Prompt:</strong><span style="color: var(--text-primary-color); font-family: var(--editor-font-family); font-size: inherit; font-weight: var(--font-weight-normal);"> </span><i data-path-to-node="7,0" data-index-in-node="8" style="color: var(--text-primary-color); font-family: var(--editor-font-family); font-size: inherit; font-weight: var(--font-weight-normal);">"Desarrollar una API RESTful en Python que exponga endpoints para la gestión del ciclo de vida de VMs (start/stop/status) y monitorización de recursos (CPU/RAM) vía SSH."</i></p>
 <figure class="post__image"><img loading="lazy"  src="https://narcisx.github.io/2damdi/media/posts/12/1.png" alt="" width="1525" height="524" sizes="(max-width: 1024px) 100vw, 1024px" srcset="https://narcisx.github.io/2damdi/media/posts/12/responsive/1-xs.png 300w ,https://narcisx.github.io/2damdi/media/posts/12/responsive/1-sm.png 480w ,https://narcisx.github.io/2damdi/media/posts/12/responsive/1-md.png 768w ,https://narcisx.github.io/2damdi/media/posts/12/responsive/1-lg.png 1024w"></figure>
 <p data-path-to-node="8">Desarrollé la API para conectar el código con las máquinas. Logré crear los endpoints necesarios para encender y apagar los servidores, y usé SSH para monitorear el consumo de CPU y RAM en tiempo real.<br><br></p>
 <p data-path-to-node="9"><strong data-path-to-node="9" data-index-in-node="0">3. Automatización del trabajo sucio</strong></p>
