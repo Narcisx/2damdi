@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Control Nexus</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>Server Control Nexus</h1>
+
+    <div class="dashboard-container" id="dashboard-container">
+        <!-- Cards will be injected by JS -->
+        <div class="loader"></div>
+    </div>
+
+    <!-- Full Screen Overlay -->
+    <!-- Full Screen Overlay -->
+    <div id="fullscreen-overlay" class="fullscreen-overlay">
+        <button class="close-btn" onclick="closeFullscreen()">×</button>
+
+        <div class="fullscreen-content-wrapper">
+            <div class="fullscreen-main">
+                <img id="fullscreen-img" src="" alt="Full Screen Preview" class="fullscreen-img">
+                <div class="fullscreen-label" id="fullscreen-label">Server Name</div>
+            </div>
+
+            <div class="fullscreen-sidebar">
+                <h3>Remote Control</h3>
+                <div class="sidebar-controls">
+                    <div class="command-input-group full-width">
+                        <input type="text" class="cmd-input" placeholder="Type command..." id="fullscreen-input"
+                            onkeypress="handleFullscreenEnter(event)">
+
+                        <button class="btn btn-send" onclick="sendFullscreenCommand()">
+                            <i class="fas fa-keyboard"></i> Type
+                        </button>
+                        <button class="btn btn-ssh" onclick="sendFullscreenSSHCommand()">
+                            <i class="fas fa-terminal"></i> SSH
+                        </button>
+                    </div>
+                    <div id="fullscreen-ssh-output" class="ssh-output hidden"></div>
+                    <div class="sidebar-help">
+                        <p><i class="fas fa-info-circle"></i> Input is injected directly into the VM keyboard.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>

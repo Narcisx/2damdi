@@ -1,0 +1,24 @@
+[
+    {
+        "id": "ubuntu_server_1",
+        "name": "UbuntuServer1",
+        "display_name": "UbuntuServer1",
+        "ip": "127.0.0.1",
+        "ssh_port": 2221,
+        "ssh_user": "servidor1",
+        "ssh_password": "servidor1",
+        "ssh_key_path": "",
+        "vbox_uuid": ""
+    },
+    {
+        "id": "ubuntu_server_2",
+        "name": "UbuntuServer2",
+        "display_name": "UbuntuServer2",
+        "ip": "127.0.0.1",
+        "ssh_port": 2222,
+        "ssh_user": "servidor2",
+        "ssh_password": "servidor2",
+        "ssh_key_path": "",
+        "vbox_uuid": ""
+    }
+]
