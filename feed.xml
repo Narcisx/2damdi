@@ -3,7 +3,7 @@
     <title>2damdi</title>
     <link href="https://narcisx.github.io/2damdi/feed.xml" rel="self" />
     <link href="https://narcisx.github.io/2damdi" />
-    <updated>2026-02-17T12:56:34+01:00</updated>
+    <updated>2026-02-17T13:56:33+01:00</updated>
     <author>
         <name>Germán Narciso Córdoba</name>
     </author>
@@ -102,7 +102,7 @@
 <li><strong>Móvil:</strong> Capacitor (Android).</li>
 <li><strong>Estado:</strong> Zustand.</li>
 <li><strong>Internacionalización:</strong> i18next.</li>
-<li><strong>Iconos:</strong> Lucide React.</li>
+<li><strong>Iconos:</strong> Lucide React.<br><br><br><br>Link a la applicación: <a href="https://narcisx.github.io/2damdi/AppFinanzasGermanNarciso.apk">Descagar APK</a></li>
 </ul>
             ]]>
         </content>
